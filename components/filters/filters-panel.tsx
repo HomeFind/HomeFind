@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { X, Sliders, ChevronRight, ChevronDown } from 'lucide-react';
+import { X, Sliders } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AttributeFilter } from './attribute-filter';
@@ -21,17 +20,6 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
   const { clearFilters, applyFilters, filters } = useFilters();
   const [attributes, setAttributes] = useState<AttributeFilterType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
-
-  // Group attributes by category (first word of attribute name)
-  const groupedAttributes = attributes.reduce((groups, attribute) => {
-    const category = attribute.name.split(' ')[0] || 'Other';
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(attribute);
-    return groups;
-  }, {} as Record<string, AttributeFilterType[]>);
 
   // Fetch attributes on component mount
   useEffect(() => {
@@ -39,16 +27,11 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
       setLoading(true);
       try {
         const attributesData = await getAttributesWithOptions();
-        setAttributes(attributesData);
-        
-        // Initialize all categories as open
-        const initialOpenState = attributesData.reduce((state, attribute) => {
-          const category = attribute.name.split(' ')[0] || 'Other';
-          state[category] = true;
-          return state;
-        }, {} as Record<string, boolean>);
-        
-        setOpenCategories(initialOpenState);
+        // Filter only ENUM, NUMBER, and BOOLEAN attributes
+        const filteredAttributes = attributesData.filter(attr => 
+          ['ENUM', 'NUMBER', 'BOOLEAN'].includes(attr.type)
+        );
+        setAttributes(filteredAttributes);
       } catch (error) {
         console.error('Error fetching attributes:', error);
       } finally {
@@ -58,13 +41,6 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
 
     fetchAttributes();
   }, []);
-
-  const toggleCategory = (category: string) => {
-    setOpenCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
-  };
 
   const handleApplyFilters = () => {
     applyFilters();
@@ -100,7 +76,6 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
                 <Skeleton className="h-10 w-full" />
               </div>
             ))}
@@ -109,36 +84,14 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
       ) : (
         <ScrollArea className="h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">
           <CardContent className="p-4">
-            <div className="space-y-1">
-              {Object.entries(groupedAttributes).map(([category, categoryAttributes]) => (
-                <Collapsible
-                  key={category}
-                  open={openCategories[category]}
-                  onOpenChange={() => toggleCategory(category)}
-                  className="pt-2"
-                >
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full flex justify-between p-2 h-auto font-medium"
-                    >
-                      {category}
-                      {openCategories[category] ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-4 px-2 pb-2">
-                    {categoryAttributes.map((attribute) => (
-                      <div key={attribute.code}>
-                        <AttributeFilter attribute={attribute} />
-                        <Separator className="mt-4" />
-                      </div>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
+            <div className="space-y-4">
+              {attributes.map((attribute) => (
+                <div key={attribute.code} className="mb-4">
+                  <AttributeFilter attribute={attribute} />
+                  {attributes.indexOf(attribute) < attributes.length - 1 && (
+                    <Separator className="mt-4" />
+                  )}
+                </div>
               ))}
             </div>
           </CardContent>

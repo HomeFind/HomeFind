@@ -66,11 +66,11 @@ export function SelectFilter({ attribute }: SelectFilterProps) {
   // Handle the display text for the button
   const getButtonText = () => {
     if (selectedOptions.length === 0) {
-      return attribute.name;
+      return "Select...";
     }
 
     if (attribute.isMultiple) {
-      return `${attribute.name} (${selectedOptions.length})`;
+      return `${selectedOptions.length} selected`;
     }
 
     // For single select, find the display name
@@ -80,24 +80,24 @@ export function SelectFilter({ attribute }: SelectFilterProps) {
 
   return (
     <div className="space-y-1">
-      <Popover open={open} onOpenChange={setOpen}>
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">{attribute.name}</span>
-          {selectedOptions.length > 0 && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={(e) => {
-                e.stopPropagation();
-                clearSelection();
-              }}
-              className="h-6 px-2 text-xs"
-            >
-              Clear
-            </Button>
-          )}
-        </div>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm font-medium">{attribute.name}</div>
+        {selectedOptions.length > 0 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={(e) => {
+              e.stopPropagation();
+              clearSelection();
+            }}
+            className="h-6 px-2 text-xs"
+          >
+            Clear
+          </Button>
+        )}
+      </div>
 
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"

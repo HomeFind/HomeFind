@@ -38,8 +38,8 @@ export function ToggleFilter({ attribute }: ToggleFilterProps) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">{attribute.name}</Label>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm font-medium">{attribute.name}</div>
         {checked !== null && (
           <Button 
             variant="ghost" 

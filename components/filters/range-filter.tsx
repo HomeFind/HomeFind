@@ -104,7 +104,7 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">{attribute.name}</Label>
+        <div className="text-sm font-medium">{attribute.name}</div>
         {hasFilter && (
           <Button 
             variant="ghost" 
