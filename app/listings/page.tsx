@@ -12,7 +12,11 @@ import { FilterValue } from '@/lib/database.types';
 function ListingsContent() {
   const { filters } = useFilters();
   const [loading, setLoading] = useState(true);
-  const [listings, setListings] = useState<Array<{ listing: any, images: string[], attributes?: Record<string, any> }>>([]);
+  const [listings, setListings] = useState<Array<{
+    listing: any,
+    images: string[],
+    attributes: Record<string, any>
+  }>>([]);
   const [pagination, setPagination] = useState({
     total: 0,
     currentPage: 1,
@@ -21,9 +25,25 @@ function ListingsContent() {
   
   // Track filters in a ref to detect changes
   const filtersRef = useRef<FilterValue[]>([]);
+  // Track if initial fetch has been done
+  const initialFetchDoneRef = useRef(false);
+
+  // Initial fetch on component mount
+  useEffect(() => {
+    if (!initialFetchDoneRef.current) {
+      console.log('Performing initial fetch of listings');
+      fetchListings(1);
+      initialFetchDoneRef.current = true;
+      filtersRef.current = [...filters];
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Fetch listings whenever filters change
   useEffect(() => {
+    // Skip the initial render since we have a separate effect for that
+    if (!initialFetchDoneRef.current) return;
+    
     // Convert filters to JSON string for comparison
     const currentFiltersJson = JSON.stringify(filters);
     const previousFiltersJson = JSON.stringify(filtersRef.current);
@@ -35,18 +55,39 @@ function ListingsContent() {
       // Update the ref with current filters
       filtersRef.current = JSON.parse(currentFiltersJson);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const fetchListings = async (page: number) => {
     setLoading(true);
     try {
       console.log('Fetching listings with filters:', filters);
+      
+      // Check if filters is a valid array
+      if (!Array.isArray(filters)) {
+        console.error('Filters is not an array:', filters);
+        throw new Error('Invalid filters format');
+      }
+      
       const result = await getListingsWithImages(filters, page);
       console.log('Fetched listings result:', result);
+      
+      if (!result.listings) {
+        console.error('No listings data returned');
+        throw new Error('No listings data returned');
+      }
+      
       setListings(result.listings);
       setPagination(result.pagination);
     } catch (error) {
       console.error('Error fetching listings:', error);
+      // Set empty listings to prevent UI errors
+      setListings([]);
+      setPagination({
+        total: 0,
+        currentPage: 1,
+        totalPages: 0
+      });
     } finally {
       setLoading(false);
     }
@@ -89,8 +130,13 @@ function ListingsContent() {
         <>
           {/* Display actual listings */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {listings.map(({ listing, images }) => (
-              <ListingItem key={listing.id} listing={listing} images={images} />
+            {listings.map(({ listing, images, attributes }) => (
+              <ListingItem 
+                key={listing.id} 
+                listing={listing} 
+                images={images} 
+                attributes={attributes}
+              />
             ))}
           </div>
           

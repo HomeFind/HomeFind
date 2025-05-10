@@ -32,7 +32,11 @@ export async function getListingsWithImages(
   page: number = 1,
   pageSize: number = 20
 ): Promise<{
-  listings: Array<{ listing: ListingItemType, images: string[] }>,
+  listings: Array<{ 
+    listing: ListingItemType, 
+    images: string[],
+    attributes: Record<string, any>
+  }>,
   pagination: { total: number, currentPage: number, totalPages: number }
 }> {
   // Convert filters to the format expected by the procedure
@@ -53,6 +57,12 @@ export async function getListingsWithImages(
 
   if (error) {
     console.error('Error fetching listings:', error);
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint
+    });
     return {
       listings: [],
       pagination: { total: 0, currentPage: page, totalPages: 0 }
