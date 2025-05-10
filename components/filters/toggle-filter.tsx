@@ -24,11 +24,18 @@ export function ToggleFilter({ attribute }: ToggleFilterProps) {
   }, [filters, attribute.code]);
 
   const handleToggleChange = (value: boolean) => {
-    setChecked(value);
-    setFilter({
-      attributeCode: attribute.code,
-      value
-    });
+    if (checked === value) {
+      // If the same value is clicked again, clear the filter
+      setChecked(null);
+      removeFilter(attribute.code);
+    } else {
+      // Otherwise, set the new value
+      setChecked(value);
+      setFilter({
+        attributeCode: attribute.code,
+        value
+      });
+    }
   };
 
   const clearFilter = () => {
@@ -52,22 +59,28 @@ export function ToggleFilter({ attribute }: ToggleFilterProps) {
         )}
       </div>
       
-      <div className="flex items-center space-x-2 pt-2">
-        <Switch
-          checked={checked === true}
-          onCheckedChange={() => handleToggleChange(true)}
-          id={`${attribute.code}-yes`}
-        />
-        <Label htmlFor={`${attribute.code}-yes`} className="text-sm">Yes</Label>
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <Switch
-          checked={checked === false}
-          onCheckedChange={() => handleToggleChange(false)}
-          id={`${attribute.code}-no`}
-        />
-        <Label htmlFor={`${attribute.code}-no`} className="text-sm">No</Label>
+      <div className="flex items-center justify-between pt-2 border rounded-md p-3">
+        <Label htmlFor={`${attribute.code}-toggle`} className="text-sm cursor-pointer">
+          {checked === true ? "Yes" : checked === false ? "No" : "Any"}
+        </Label>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant={checked === false ? "default" : "outline"} 
+            size="sm"
+            onClick={() => handleToggleChange(false)}
+            className="h-8 px-3"
+          >
+            No
+          </Button>
+          <Button 
+            variant={checked === true ? "default" : "outline"} 
+            size="sm"
+            onClick={() => handleToggleChange(true)}
+            className="h-8 px-3"
+          >
+            Yes
+          </Button>
+        </div>
       </div>
     </div>
   );
