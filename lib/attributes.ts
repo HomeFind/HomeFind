@@ -35,29 +35,43 @@ export async function getAttributeOptions(attributeId: number): Promise<Attribut
   return data || [];
 }
 
+interface AttributeResult {
+  id: number;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: 'NUMBER' | 'VARCHAR' | 'DATE' | 'BOOLEAN' | 'ENUM';
+  is_enumeration: boolean;
+  is_multiple: boolean;
+  options: any[] | null;
+  min_value: number | null;
+  max_value: number | null;
+}
+
 /**
- * Fetches all attribute definitions with their options
+ * Fetches all attribute definitions with their options and min/max values using the database procedure
  */
 export async function getAttributesWithOptions(): Promise<AttributeFilter[]> {
-  const attributes = await getAttributes();
-  
-  const attributesWithOptions = await Promise.all(
-    attributes.map(async (attribute) => {
-      let options: AttributeOptionType[] | undefined = undefined;
-      
-      if (attribute.is_enumeration) {
-        options = await getAttributeOptions(attribute.id);
-      }
-      
-      return {
-        code: attribute.attribute_code,
-        type: attribute.data_type,
-        name: attribute.attribute_name,
-        options,
-        isMultiple: attribute.is_multiple
-      };
+  const { data, error } = await supabase
+    .rpc('get_attributes');
+
+  if (error) {
+    console.error('Error fetching attributes:', error);
+    return [];
+  }
+
+  // Transform the data into the expected format
+  const attributes: AttributeFilter[] = data.map((attr: AttributeResult) => ({
+    code: attr.attribute_code,
+    type: attr.data_type,
+    name: attr.attribute_name,
+    options: attr.options || [],
+    isMultiple: attr.is_multiple,
+    // Add min/max for NUMBER types
+    ...(attr.data_type === 'NUMBER' && {
+      minValue: attr.min_value,
+      maxValue: attr.max_value
     })
-  );
+  }));
   
-  return attributesWithOptions;
+  return attributes;
 } 

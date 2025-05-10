@@ -1,0 +1,1 @@
+"You'll need to add a placeholder-property.jpg file to the public directory" 
