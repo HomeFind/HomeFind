@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { FiltersPanel, FilterProvider, MobileFilterDialog, useFilters } from '@/components/filters';
+import { FiltersPanel, FilterProvider, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
 import { ListingItem } from '@/components/listing-item';
 import { getListingsWithImages } from '@/lib/listings';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -109,6 +109,9 @@ function ListingsContent() {
           <MobileFilterDialog />
         </div>
       </div>
+      
+      {/* Applied Filters and Listing Count */}
+      <AppliedFilters listingCount={pagination.total} loading={loading} />
       
       {loading ? (
         // Skeleton loader while listings are being fetched

@@ -31,7 +31,6 @@ const formatAttributeValue = (value: any): string => {
 
 export function ListingItem({ listing, images, attributes = {} }: ListingItemProps) {
   const [imageError, setImageError] = useState(false);
-  const [showAllAttributes, setShowAllAttributes] = useState(false);
   
   // Get the first valid image URL or null
   const imageUrl = images.length > 0 && isValidImageUrl(images[0]) && !imageError
@@ -47,11 +46,19 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
       .trim();
   };
 
-  // Filter out important attributes to show at the top
-  const importantAttributes = ['price', 'living_area', 'total_area', 'number_of_rooms', 'floor'];
-  const otherAttributes = Object.entries(attributes || {})
-    .filter(([key]) => !importantAttributes.includes(key))
-    .sort(([a], [b]) => a.localeCompare(b));
+  // Arrange attributes in a logical order
+  const sortedAttributes = [
+    // Important attributes first
+    ...(attributes?.number_of_rooms ? [['number_of_rooms', attributes.number_of_rooms]] : []),
+    ...(attributes?.living_area ? [['living_area', attributes.living_area]] : []),
+    ...(attributes?.total_area ? [['total_area', attributes.total_area]] : []),
+    ...(attributes?.floor ? [['floor', attributes.floor]] : []),
+    
+    // Then all other attributes sorted alphabetically
+    ...Object.entries(attributes || {})
+      .filter(([key]) => !['number_of_rooms', 'living_area', 'total_area', 'floor', 'housing_type', 'renovation'].includes(key))
+      .sort(([a], [b]) => a.localeCompare(b))
+  ];
 
   return (
     <Card className="overflow-hidden h-full flex flex-col">
@@ -81,7 +88,7 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
         )}
         
         {/* Important Attributes */}
-        <div className="grid grid-cols-2 gap-2 mt-3 mb-2">
+        <div className="grid grid-cols-2 gap-2 mt-3 mb-3">
           {attributes?.number_of_rooms && (
             <div className="flex items-center gap-1">
               <span className="text-xs text-muted-foreground">Rooms:</span>
@@ -112,27 +119,17 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
         </div>
         
         {/* All Other Attributes */}
-        {otherAttributes.length > 0 && (
-          <div className={`mt-3 ${showAllAttributes ? 'block' : 'hidden'}`}>
-            <h4 className="text-sm font-medium mb-2">All Details</h4>
+        {sortedAttributes.length > 0 && (
+          <div className="mt-3">
             <div className="grid grid-cols-1 gap-1">
-              {otherAttributes.map(([key, value]) => (
+              {sortedAttributes.map(([key, value]) => (
                 <div key={key} className="flex items-start text-xs">
-                  <span className="text-muted-foreground min-w-[100px]">{formatAttributeName(key)}:</span>
+                  <span className="text-muted-foreground min-w-[120px]">{formatAttributeName(key)}:</span>
                   <span className="font-medium truncate">{formatAttributeValue(value)}</span>
                 </div>
               ))}
             </div>
           </div>
-        )}
-        
-        {otherAttributes.length > 0 && (
-          <button 
-            onClick={() => setShowAllAttributes(!showAllAttributes)}
-            className="text-xs text-primary hover:underline mt-2"
-          >
-            {showAllAttributes ? 'Hide details' : 'Show all details'}
-          </button>
         )}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
