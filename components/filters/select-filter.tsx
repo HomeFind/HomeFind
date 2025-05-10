@@ -10,26 +10,33 @@ import { useFilters } from './filter-context';
 
 interface SelectFilterProps {
   attribute: AttributeFilter;
+  onInteraction?: () => void;
 }
 
-export function SelectFilter({ attribute }: SelectFilterProps) {
-  const { setFilter, filters, removeFilter } = useFilters();
+export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
+  const { setFilter, pendingFilters, removeFilter } = useFilters();
   const [open, setOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   // Initialize from existing filters
   useEffect(() => {
-    const existingFilter = filters.find(f => f.attributeCode === attribute.code);
+    const existingFilter = pendingFilters.find(f => f.attributeCode === attribute.code);
     if (existingFilter) {
       if (Array.isArray(existingFilter.value)) {
         setSelectedOptions(existingFilter.value as string[]);
       } else if (existingFilter.value !== null) {
         setSelectedOptions([existingFilter.value.toString()]);
       }
+    } else {
+      // Reset when filter is removed
+      setSelectedOptions([]);
     }
-  }, [filters, attribute.code]);
+  }, [pendingFilters, attribute.code]);
 
   const handleOptionToggle = (optionValue: string) => {
+    // Call onInteraction only once when an option is changed
+    if (onInteraction) onInteraction();
+    
     let newSelectedOptions: string[];
 
     if (attribute.isMultiple) {
@@ -59,6 +66,7 @@ export function SelectFilter({ attribute }: SelectFilterProps) {
   };
 
   const clearSelection = () => {
+    if (onInteraction) onInteraction();
     setSelectedOptions([]);
     removeFilter(attribute.code);
   };
@@ -77,6 +85,15 @@ export function SelectFilter({ attribute }: SelectFilterProps) {
     const optionObj = attribute.options?.find(opt => opt.option_value === selectedOptions[0]);
     return optionObj ? optionObj.option_value : selectedOptions[0];
   };
+
+  // Filter options based on available values
+  const filteredOptions = attribute.options?.filter(option => {
+    // If we have available options, only show those
+    if (attribute.availableOptions && attribute.availableOptions.length > 0) {
+      return attribute.availableOptions.includes(option.option_value);
+    }
+    return true;
+  });
 
   return (
     <div className="space-y-1">
@@ -97,7 +114,14 @@ export function SelectFilter({ attribute }: SelectFilterProps) {
         )}
       </div>
 
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover 
+        open={open} 
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen);
+          // Only call onInteraction when opening, not on every change
+          if (isOpen && onInteraction) onInteraction();
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -114,11 +138,17 @@ export function SelectFilter({ attribute }: SelectFilterProps) {
             <CommandInput placeholder={`Search ${attribute.name.toLowerCase()}...`} />
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
-              {attribute.options?.map((option) => (
+              {filteredOptions?.map((option) => (
                 <CommandItem
                   key={option.id}
                   value={option.option_value}
                   onSelect={() => handleOptionToggle(option.option_value)}
+                  disabled={attribute.availableOptions && !attribute.availableOptions.includes(option.option_value)}
+                  className={cn(
+                    attribute.availableOptions && !attribute.availableOptions.includes(option.option_value) 
+                      ? "opacity-50 cursor-not-allowed" 
+                      : ""
+                  )}
                 >
                   <Check
                     className={cn(

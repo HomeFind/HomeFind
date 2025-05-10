@@ -143,6 +143,13 @@ export interface AttributeFilter {
   name: string
   options?: AttributeOptionType[]
   isMultiple: boolean
+  minValue?: number | null
+  maxValue?: number | null
+  // Available values based on current filters
+  availableMinValue?: number | null
+  availableMaxValue?: number | null
+  availableOptions?: string[] | null
+  availableValues?: boolean[] | null
 }
 
 export interface FilterValue {

@@ -6,9 +6,10 @@ import { ToggleFilter } from './toggle-filter';
 
 interface AttributeFilterProps {
   attribute: AttributeFilterType;
+  onInteraction?: () => void;
 }
 
-export function AttributeFilter({ attribute }: AttributeFilterProps) {
+export function AttributeFilter({ attribute, onInteraction }: AttributeFilterProps) {
   // Only render filters for ENUM, NUMBER, and BOOLEAN types
   switch (attribute.type) {
     case 'NUMBER':
@@ -16,15 +17,16 @@ export function AttributeFilter({ attribute }: AttributeFilterProps) {
         <RangeFilter 
           attribute={attribute} 
           min={attribute.minValue ?? 0} 
-          max={attribute.maxValue ?? 100} 
+          max={attribute.maxValue ?? 100}
+          onInteraction={onInteraction}
         />
       );
     
     case 'BOOLEAN':
-      return <ToggleFilter attribute={attribute} />;
+      return <ToggleFilter attribute={attribute} onInteraction={onInteraction} />;
     
     case 'ENUM':
-      return <SelectFilter attribute={attribute} />;
+      return <SelectFilter attribute={attribute} onInteraction={onInteraction} />;
     
     default:
       // Skip all other attribute types

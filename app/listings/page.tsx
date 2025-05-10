@@ -7,6 +7,7 @@ import { getListingsWithImages } from '@/lib/listings';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { FilterValue } from '@/lib/database.types';
 
 function ListingsContent() {
   const { filters } = useFilters();
@@ -17,24 +18,31 @@ function ListingsContent() {
     currentPage: 1,
     totalPages: 0
   });
-  const prevFiltersRef = useRef<string>('');
+  
+  // Track filters in a ref to detect changes
+  const filtersRef = useRef<FilterValue[]>([]);
 
+  // Fetch listings whenever filters change
   useEffect(() => {
-    // Convert filters to a string to compare with previous filters
-    const filtersString = JSON.stringify(filters);
+    // Convert filters to JSON string for comparison
+    const currentFiltersJson = JSON.stringify(filters);
+    const previousFiltersJson = JSON.stringify(filtersRef.current);
     
-    // Only fetch if filters have actually changed
-    if (filtersString !== prevFiltersRef.current) {
+    // Only fetch if filters have changed - deep comparison
+    if (currentFiltersJson !== previousFiltersJson) {
+      console.log('Filters changed, fetching new listings:', filters);
       fetchListings(1);
       // Update the ref with current filters
-      prevFiltersRef.current = filtersString;
+      filtersRef.current = JSON.parse(currentFiltersJson);
     }
   }, [filters]);
 
   const fetchListings = async (page: number) => {
     setLoading(true);
     try {
+      console.log('Fetching listings with filters:', filters);
       const result = await getListingsWithImages(filters, page);
+      console.log('Fetched listings result:', result);
       setListings(result.listings);
       setPagination(result.pagination);
     } catch (error) {

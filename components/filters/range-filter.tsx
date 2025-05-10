@@ -8,38 +8,82 @@ import { useFilters } from './filter-context';
 
 interface RangeFilterProps {
   attribute: AttributeFilter;
-  min?: number;
-  max?: number;
+  min?: number | null;
+  max?: number | null;
   step?: number;
+  onInteraction?: () => void;
 }
 
-export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFilterProps) {
-  const { filters, setFilter, removeFilter } = useFilters();
-  const [range, setRange] = useState<[number, number]>([min, max]);
-  const [inputValues, setInputValues] = useState<[string, string]>([min.toString(), max.toString()]);
+export function RangeFilter({ 
+  attribute, 
+  min = 0, 
+  max = 100, 
+  step = 1,
+  onInteraction
+}: RangeFilterProps) {
+  // Ensure min and max are valid numbers based on attribute data
+  const baseMin = typeof min === 'number' ? min : 0;
+  const baseMax = typeof max === 'number' ? max : 100;
+  
+  // Use available min/max from filtered data if present
+  const actualMin = typeof attribute.availableMinValue === 'number' ? attribute.availableMinValue : baseMin;
+  const actualMax = typeof attribute.availableMaxValue === 'number' ? attribute.availableMaxValue : baseMax;
+  
+  const { pendingFilters, setFilter, removeFilter } = useFilters();
+  const [range, setRange] = useState<[number, number]>([actualMin, actualMax]);
+  const [inputValues, setInputValues] = useState<[string, string]>([actualMin.toString(), actualMax.toString()]);
   const [hasFilter, setHasFilter] = useState(false);
 
-  // Initialize from existing filters
+  // Initialize from existing filters or available values when they change
   useEffect(() => {
-    const existingFilter = filters.find(f => f.attributeCode === attribute.code);
+    const existingFilter = pendingFilters.find(f => f.attributeCode === attribute.code);
     
     if (existingFilter && Array.isArray(existingFilter.value)) {
       const filterValue = existingFilter.value as [number, number];
-      setRange(filterValue);
-      setInputValues([filterValue[0].toString(), filterValue[1].toString()]);
+      
+      // Ensure filter values are within the available range
+      const clampedMin = Math.max(filterValue[0], actualMin);
+      const clampedMax = Math.min(filterValue[1], actualMax);
+      
+      setRange([clampedMin, clampedMax]);
+      setInputValues([clampedMin.toString(), clampedMax.toString()]);
       setHasFilter(true);
+      
+      // Update filter if values were clamped
+      if (clampedMin !== filterValue[0] || clampedMax !== filterValue[1]) {
+        setFilter({
+          attributeCode: attribute.code,
+          value: [clampedMin, clampedMax]
+        });
+      }
     } else {
+      // Reset to defaults when no filter is active
+      setRange([actualMin, actualMax]);
+      setInputValues([actualMin.toString(), actualMax.toString()]);
       setHasFilter(false);
     }
-  }, [filters, attribute.code]);
+  }, [pendingFilters, attribute.code, actualMin, actualMax, attribute.availableMinValue, attribute.availableMaxValue, setFilter]);
+
+  // Debug log to help see when available values change
+  useEffect(() => {
+    console.log(`Range filter ${attribute.code} available values:`, {
+      min: attribute.minValue,
+      max: attribute.maxValue,
+      availableMin: attribute.availableMinValue,
+      availableMax: attribute.availableMaxValue
+    });
+  }, [attribute.minValue, attribute.maxValue, attribute.availableMinValue, attribute.availableMaxValue, attribute.code]);
 
   const handleSliderChange = (values: number[]) => {
+    // Call onInteraction when the slider is changed
+    if (onInteraction) onInteraction();
+    
     const newRange: [number, number] = [values[0], values[1]];
     setRange(newRange);
     setInputValues([newRange[0].toString(), newRange[1].toString()]);
     
     // Only set the filter if it's different from the min/max
-    if (newRange[0] > min || newRange[1] < max) {
+    if (newRange[0] > actualMin || newRange[1] < actualMax) {
       setFilter({
         attributeCode: attribute.code,
         value: newRange
@@ -52,6 +96,9 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
   };
 
   const handleInputChange = (index: 0 | 1, value: string) => {
+    // Call onInteraction when input changes
+    if (onInteraction) onInteraction();
+    
     // Update the input value immediately for responsive UI
     const newInputValues: [string, string] = [...inputValues] as [string, string];
     newInputValues[index] = value;
@@ -77,12 +124,23 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
       setInputValues(newInputValues);
     }
     
+    // Clamp to available values
+    if (index === 0 && newRange[0] < actualMin) {
+      newRange[0] = actualMin;
+      newInputValues[0] = actualMin.toString();
+      setInputValues(newInputValues);
+    } else if (index === 1 && newRange[1] > actualMax) {
+      newRange[1] = actualMax;
+      newInputValues[1] = actualMax.toString();
+      setInputValues(newInputValues);
+    }
+    
     setRange(newRange);
   };
 
   const handleInputBlur = () => {
     // When the input loses focus, update the filter
-    if (range[0] > min || range[1] < max) {
+    if (range[0] > actualMin || range[1] < actualMax) {
       setFilter({
         attributeCode: attribute.code,
         value: range
@@ -95,8 +153,10 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
   };
 
   const clearFilter = () => {
-    setRange([min, max]);
-    setInputValues([min.toString(), max.toString()]);
+    if (onInteraction) onInteraction();
+    
+    setRange([actualMin, actualMax]);
+    setInputValues([actualMin.toString(), actualMax.toString()]);
     removeFilter(attribute.code);
     setHasFilter(false);
   };
@@ -119,10 +179,10 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
       
       <div className="pt-4 px-2">
         <Slider
-          defaultValue={[min, max]}
+          defaultValue={[actualMin, actualMax]}
           value={[range[0], range[1]]}
-          min={min}
-          max={max}
+          min={actualMin}
+          max={actualMax}
           step={step}
           onValueChange={handleSliderChange}
           className="my-6"
@@ -135,7 +195,7 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
           <Input
             id={`${attribute.code}-min`}
             type="number"
-            min={min}
+            min={actualMin}
             max={range[1]}
             step={step}
             value={inputValues[0]}
@@ -151,7 +211,7 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
             id={`${attribute.code}-max`}
             type="number"
             min={range[0]}
-            max={max}
+            max={actualMax}
             step={step}
             value={inputValues[1]}
             onChange={(e) => handleInputChange(1, e.target.value)}
@@ -160,6 +220,14 @@ export function RangeFilter({ attribute, min = 0, max = 100, step = 1 }: RangeFi
           />
         </div>
       </div>
+      
+      {/* Display available range info if different from base range */}
+      {(attribute.availableMinValue !== null || attribute.availableMaxValue !== null) && 
+       (attribute.availableMinValue !== attribute.minValue || attribute.availableMaxValue !== attribute.maxValue) && (
+        <div className="text-xs text-muted-foreground mt-1">
+          Available range: {attribute.availableMinValue} - {attribute.availableMaxValue}
+        </div>
+      )}
     </div>
   );
 } 

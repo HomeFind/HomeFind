@@ -7,23 +7,27 @@ import { useFilters } from './filter-context';
 
 interface ToggleFilterProps {
   attribute: AttributeFilter;
+  onInteraction?: () => void;
 }
 
-export function ToggleFilter({ attribute }: ToggleFilterProps) {
-  const { filters, setFilter, removeFilter } = useFilters();
+export function ToggleFilter({ attribute, onInteraction }: ToggleFilterProps) {
+  const { pendingFilters, setFilter, removeFilter } = useFilters();
   const [checked, setChecked] = useState<boolean | null>(null);
 
   // Initialize from existing filters
   useEffect(() => {
-    const existingFilter = filters.find(f => f.attributeCode === attribute.code);
+    const existingFilter = pendingFilters.find(f => f.attributeCode === attribute.code);
     if (existingFilter && typeof existingFilter.value === 'boolean') {
       setChecked(existingFilter.value);
     } else {
       setChecked(null);
     }
-  }, [filters, attribute.code]);
+  }, [pendingFilters, attribute.code]);
 
   const handleToggleChange = (value: boolean) => {
+    // Notify parent component about interaction
+    if (onInteraction) onInteraction();
+    
     if (checked === value) {
       // If the same value is clicked again, clear the filter
       setChecked(null);
@@ -39,8 +43,17 @@ export function ToggleFilter({ attribute }: ToggleFilterProps) {
   };
 
   const clearFilter = () => {
+    // Notify parent component about interaction
+    if (onInteraction) onInteraction();
+    
     setChecked(null);
     removeFilter(attribute.code);
+  };
+
+  // Check if the option is available based on filter context
+  const isOptionAvailable = (value: boolean) => {
+    if (!attribute.availableValues) return true;
+    return attribute.availableValues.includes(value);
   };
 
   return (
@@ -69,6 +82,7 @@ export function ToggleFilter({ attribute }: ToggleFilterProps) {
             size="sm"
             onClick={() => handleToggleChange(false)}
             className="h-8 px-3"
+            disabled={!isOptionAvailable(false)}
           >
             No
           </Button>
@@ -77,6 +91,7 @@ export function ToggleFilter({ attribute }: ToggleFilterProps) {
             size="sm"
             onClick={() => handleToggleChange(true)}
             className="h-8 px-3"
+            disabled={!isOptionAvailable(true)}
           >
             Yes
           </Button>

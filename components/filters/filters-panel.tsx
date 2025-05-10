@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { X, Sliders } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,35 +17,143 @@ interface FiltersPanelProps {
 }
 
 export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanelProps) {
-  const { clearFilters, applyFilters, filters } = useFilters();
+  const { clearFilters, applyFilters, filters, pendingFilters } = useFilters();
   const [attributes, setAttributes] = useState<AttributeFilterType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeAttribute, setActiveAttribute] = useState<string | undefined>(undefined);
+  const [shouldApplyFilters, setShouldApplyFilters] = useState(false);
+  
+  // Use a ref to track if we should fetch new attributes
+  const shouldFetchRef = useRef(true);
+  const pendingFiltersRef = useRef(pendingFilters);
 
-  // Fetch attributes on component mount
+  // Initial fetch and when filters are explicitly applied
   useEffect(() => {
-    const fetchAttributes = async () => {
-      setLoading(true);
+    if (shouldFetchRef.current) {
+      const fetchAttributes = async () => {
+        setLoading(true);
+        try {
+          const attributesData = await getAttributesWithOptions(filters, activeAttribute);
+          // Filter only ENUM, NUMBER, and BOOLEAN attributes
+          const filteredAttributes = attributesData.filter(attr => 
+            ['ENUM', 'NUMBER', 'BOOLEAN'].includes(attr.type)
+          );
+          setAttributes(filteredAttributes);
+          pendingFiltersRef.current = [...filters];
+        } catch (error) {
+          console.error('Error fetching attributes:', error);
+        } finally {
+          setLoading(false);
+          shouldFetchRef.current = false;
+        }
+      };
+
+      fetchAttributes();
+    }
+  }, [filters, activeAttribute]);
+
+  // Only refresh options for the active attribute when interacting
+  const handleAttributeInteraction = useCallback((attributeCode: string) => {
+    setActiveAttribute(attributeCode);
+    
+    // Only refresh attribute options when explicitly interacting
+    const fetchAttributeOptions = async () => {
       try {
-        const attributesData = await getAttributesWithOptions();
-        // Filter only ENUM, NUMBER, and BOOLEAN attributes
+        const attributesData = await getAttributesWithOptions(pendingFiltersRef.current, attributeCode);
+        
+        // Update only the active attribute while preserving others
+        setAttributes(prevAttributes => {
+          const newAttributes = [...prevAttributes];
+          
+          // Find and update the active attribute
+          const activeAttributeData = attributesData.find(attr => attr.code === attributeCode);
+          if (activeAttributeData) {
+            const index = newAttributes.findIndex(attr => attr.code === attributeCode);
+            if (index !== -1) {
+              newAttributes[index] = activeAttributeData;
+            }
+          }
+          
+          return newAttributes;
+        });
+      } catch (error) {
+        console.error('Error fetching attribute options:', error);
+      }
+    };
+    
+    fetchAttributeOptions();
+  }, []);
+
+  // Apply filters function that's called manually
+  const handleApplyFilters = useCallback(() => {
+    // Mark that we should fetch fresh attributes on next render
+    shouldFetchRef.current = true;
+    
+    // Force a complete refresh of attributes after applying filters
+    const applyAndRefresh = async () => {
+      // First apply the filters to update the global state
+      applyFilters();
+      
+      // Then explicitly fetch fresh attributes with the new filters
+      try {
+        setLoading(true);
+        console.log('Fetching fresh attributes after filter application...');
+        const attributesData = await getAttributesWithOptions(pendingFilters, activeAttribute);
+        
+        // Update all attributes with fresh data
         const filteredAttributes = attributesData.filter(attr => 
           ['ENUM', 'NUMBER', 'BOOLEAN'].includes(attr.type)
         );
+        
+        console.log('Received fresh attributes:', filteredAttributes);
         setAttributes(filteredAttributes);
+        pendingFiltersRef.current = [...pendingFilters];
       } catch (error) {
-        console.error('Error fetching attributes:', error);
+        console.error('Error fetching fresh attributes:', error);
+      } finally {
+        setLoading(false);
+      }
+      
+      // If needed, close the panel
+      onClose?.();
+    };
+    
+    applyAndRefresh();
+  }, [applyFilters, pendingFilters, activeAttribute, onClose]);
+
+  // Handle clearing filters
+  const handleClearFilters = useCallback(() => {
+    // Mark that we should fetch fresh attributes on next render
+    shouldFetchRef.current = true;
+    
+    // Clear filters and then refresh attributes
+    const clearAndRefresh = async () => {
+      // First clear the filters
+      clearFilters();
+      
+      // Then fetch fresh attributes with no filters
+      try {
+        setLoading(true);
+        console.log('Fetching fresh attributes after clearing filters...');
+        const attributesData = await getAttributesWithOptions([], undefined);
+        
+        // Update all attributes with fresh data
+        const filteredAttributes = attributesData.filter(attr => 
+          ['ENUM', 'NUMBER', 'BOOLEAN'].includes(attr.type)
+        );
+        
+        console.log('Received fresh attributes after clearing:', filteredAttributes);
+        setAttributes(filteredAttributes);
+        pendingFiltersRef.current = [];
+      } catch (error) {
+        console.error('Error fetching fresh attributes:', error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAttributes();
-  }, []);
-
-  const handleApplyFilters = () => {
-    applyFilters();
-    onClose?.();
-  };
+    
+    clearAndRefresh();
+  }, [clearFilters]);
 
   // Skip rendering if panel is closed and not in mobile
   if (!isOpen) {
@@ -53,6 +161,8 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
   }
 
   const hasActiveFilters = filters.length > 0;
+  const hasPendingFilters = pendingFilters.length > 0;
+  const hasFilterChanges = JSON.stringify(filters) !== JSON.stringify(pendingFilters);
 
   return (
     <Card className={`overflow-hidden shadow-md ${className}`}>
@@ -86,8 +196,16 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
           <CardContent className="p-4">
             <div className="space-y-4">
               {attributes.map((attribute) => (
-                <div key={attribute.code} className="mb-4">
-                  <AttributeFilter attribute={attribute} />
+                <div 
+                  key={attribute.code} 
+                  className="mb-4"
+                  onFocus={() => handleAttributeInteraction(attribute.code)}
+                  onClick={() => handleAttributeInteraction(attribute.code)}
+                >
+                  <AttributeFilter 
+                    attribute={attribute} 
+                    onInteraction={() => handleAttributeInteraction(attribute.code)} 
+                  />
                   {attributes.indexOf(attribute) < attributes.length - 1 && (
                     <Separator className="mt-4" />
                   )}
@@ -102,15 +220,15 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
         <Button
           variant="ghost"
           size="sm"
-          onClick={clearFilters}
-          disabled={!hasActiveFilters}
+          onClick={handleClearFilters}
+          disabled={!hasPendingFilters}
         >
           Clear All
         </Button>
         <Button
           size="sm"
           onClick={handleApplyFilters}
-          disabled={!hasActiveFilters}
+          disabled={!hasFilterChanges}
         >
           Apply Filters
         </Button>

@@ -41,6 +41,9 @@ export async function getListingsWithImages(
     value: filter.value
   }));
 
+  // Log the filters being sent to the database
+  console.log('Sending filters to database:', JSON.stringify(filterJson));
+
   // Call the procedure
   const { data, error } = await supabase.rpc('get_listings', {
     filter_json: filterJson.length > 0 ? filterJson : null,
