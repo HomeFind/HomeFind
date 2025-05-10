@@ -12,7 +12,13 @@ export function AttributeFilter({ attribute }: AttributeFilterProps) {
   // Only render filters for ENUM, NUMBER, and BOOLEAN types
   switch (attribute.type) {
     case 'NUMBER':
-      return <RangeFilter attribute={attribute} />;
+      return (
+        <RangeFilter 
+          attribute={attribute} 
+          min={attribute.minValue ?? 0} 
+          max={attribute.maxValue ?? 100} 
+        />
+      );
     
     case 'BOOLEAN':
       return <ToggleFilter attribute={attribute} />;
