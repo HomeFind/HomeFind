@@ -13,7 +13,8 @@ interface FilterContextType {
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
-export function FilterProvider({ children }: { children: ReactNode }) {
+// This component uses useSearchParams and should be wrapped in Suspense
+export function FilterProviderWithSearchParams({ children }: { children: ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<FilterValue[]>([]);
@@ -165,6 +166,11 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       {children}
     </FilterContext.Provider>
   );
+}
+
+// Wrapper component that doesn't use useSearchParams directly
+export function FilterProvider({ children }: { children: ReactNode }) {
+  return <FilterProviderWithSearchParams>{children}</FilterProviderWithSearchParams>;
 }
 
 export function useFilters() {

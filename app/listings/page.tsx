@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { FiltersPanel, FilterProvider, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
+import { FiltersPanel, FilterProvider, FilterProviderWithSearchParams, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
 import { ListingItem } from '@/components/listing-item';
 import { getListingsWithImages } from '@/lib/listings';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -185,22 +185,48 @@ function ListingsContent() {
   );
 }
 
+// Loading component to display while suspense is resolving
+function FiltersLoading() {
+  return (
+    <div className="animate-pulse">
+      <div className="mb-6 h-8 w-48 bg-muted rounded"></div>
+      <div className="mb-4 h-20 bg-muted/30 rounded-md"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-card rounded-lg shadow-sm border overflow-hidden">
+            <div className="aspect-video w-full bg-muted"></div>
+            <div className="p-4 space-y-2">
+              <div className="h-6 w-3/4 bg-muted rounded"></div>
+              <div className="h-4 w-full bg-muted rounded"></div>
+              <div className="flex justify-between pt-2">
+                <div className="h-5 w-24 bg-muted rounded"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ListingsPage() {
   return (
     <div className="container mx-auto py-8">
-      <FilterProvider>
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar Filter Panel - Visible on desktop */}
-          <div className="hidden md:block w-full md:w-80 shrink-0">
-            <FiltersPanel />
+      <Suspense fallback={<FiltersLoading />}>
+        <FilterProviderWithSearchParams>
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Sidebar Filter Panel - Visible on desktop */}
+            <div className="hidden md:block w-full md:w-80 shrink-0">
+              <FiltersPanel />
+            </div>
+            
+            {/* Main Content */}
+            <div className="flex-1">
+              <ListingsContent />
+            </div>
           </div>
-          
-          {/* Main Content */}
-          <div className="flex-1">
-            <ListingsContent />
-          </div>
-        </div>
-      </FilterProvider>
+        </FilterProviderWithSearchParams>
+      </Suspense>
     </div>
   );
 } 
