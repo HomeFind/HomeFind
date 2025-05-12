@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, Filter, FilterX } from 'lucide-react';
 import { FilterValue } from '@/lib/database.types';
 import { useFilters } from './filter-context';
+import { cn } from '@/lib/utils';
 
 interface AppliedFiltersProps {
   listingCount: number;
@@ -11,7 +12,7 @@ interface AppliedFiltersProps {
 }
 
 // Function to format filter values for display
-const formatFilterDisplay = (filter: FilterValue): string => {
+const formatFilterDisplay = (filter: FilterValue): { label: string; value: string } => {
   // Convert attributeCode from snake_case or camelCase to Title Case
   const attributeName = filter.attributeCode
     .replace(/_/g, ' ')
@@ -41,7 +42,7 @@ const formatFilterDisplay = (filter: FilterValue): string => {
     valueDisplay = String(filter.value);
   }
   
-  return `${attributeName}: ${valueDisplay}`;
+  return { label: attributeName, value: valueDisplay };
 };
 
 export function AppliedFilters({ listingCount, loading = false }: AppliedFiltersProps) {
@@ -59,31 +60,51 @@ export function AppliedFilters({ listingCount, loading = false }: AppliedFilters
     clearFilters();
   };
   
+  if (filters.length === 0) return null;
+
   return (
-    <div className="mb-3 bg-muted/30 p-2 rounded-md text-sm">
-      {filters.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1">
-          <span className="text-xs text-muted-foreground py-1">Filters:</span>
-          {filters.map((filter) => (
+    <div className="mb-2 animate-in fade-in-0 zoom-in-95 duration-200">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Filter className="h-3 w-3" />
+          <span className="font-medium">Active Filters</span>
+        </div>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-6 px-1.5 text-xs flex items-center gap-1 text-muted-foreground hover:text-foreground"
+          onClick={handleClearAll}
+        >
+          <FilterX className="h-3 w-3" />
+          <span>Reset</span>
+        </Button>
+      </div>
+      
+      <div className="flex flex-wrap gap-1.5">
+        {filters.map((filter) => {
+          const { label, value } = formatFilterDisplay(filter);
+          return (
             <Badge 
               key={filter.attributeCode} 
-              variant="secondary" 
-              className="text-xs flex items-center gap-1 pl-2 pr-1 py-1"
+              variant="outline"
+              className={cn(
+                "text-xs rounded-full px-2 py-0.5 border border-border/60 bg-background",
+                "flex items-center gap-1 hover:bg-accent/40 transition-colors whitespace-nowrap"
+              )}
             >
-              {formatFilterDisplay(filter)}
-              <Button
-                variant="ghost" 
-                size="sm" 
-                className="h-4 w-4 p-0 ml-1 hover:bg-muted-foreground/20 rounded-full"
+              <span className="font-medium">{label}:</span>
+              <span>{value}</span>
+              <button 
+                className="ml-0.5 rounded-full p-0.5 hover:bg-muted flex items-center justify-center"
                 onClick={() => handleRemoveFilter(filter.attributeCode)}
+                aria-label={`Remove ${label} filter`}
               >
-                <X className="h-3 w-3" />
-                <span className="sr-only">Remove filter</span>
-              </Button>
+                <X className="h-2.5 w-2.5" />
+              </button>
             </Badge>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 } 

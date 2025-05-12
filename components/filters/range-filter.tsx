@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AttributeFilter } from '@/lib/database.types';
 import { useFilters } from './filter-context';
+import { ArrowRightCircle, MinusCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface RangeFilterProps {
   attribute: AttributeFilter;
@@ -161,73 +163,101 @@ export function RangeFilter({
     setHasFilter(false);
   };
 
+  // Calculate percentage of how much the range is narrowed
+  const rangePercentage = Math.round(
+    ((range[1] - range[0]) / (actualMax - actualMin)) * 100
+  );
+  const isFullRange = range[0] === actualMin && range[1] === actualMax;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-xs font-medium">{attribute.name}</div>
+        <div className="text-xs font-medium flex items-center gap-1.5">
+          {attribute.name}
+          {!isFullRange && (
+            <span className="text-[10px] text-muted-foreground">
+              ({100 - rangePercentage}% narrowed)
+            </span>
+          )}
+        </div>
         {hasFilter && (
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={clearFilter}
-            className="h-5 px-2 text-xs"
+            className="h-5 px-2 text-xs text-muted-foreground"
           >
-            Clear
+            Reset
           </Button>
         )}
       </div>
-      
-      <div className="pt-2 px-1">
-        <Slider
-          defaultValue={[actualMin, actualMax]}
-          value={[range[0], range[1]]}
-          min={actualMin}
-          max={actualMax}
-          step={step}
-          onValueChange={handleSliderChange}
-          className="my-4"
-        />
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <div className="flex-1">
-          <Label htmlFor={`${attribute.code}-min`} className="sr-only">Minimum</Label>
-          <Input
-            id={`${attribute.code}-min`}
-            type="number"
+
+      <div className="pt-2">
+        <div className="mb-5 px-1.5">
+          <Slider
+            defaultValue={[actualMin, actualMax]}
+            value={[range[0], range[1]]}
             min={actualMin}
-            max={range[1]}
-            step={step}
-            value={inputValues[0]}
-            onChange={(e) => handleInputChange(0, e.target.value)}
-            onBlur={handleInputBlur}
-            className="h-7 text-xs"
-          />
-        </div>
-        <span className="text-xs text-muted-foreground">to</span>
-        <div className="flex-1">
-          <Label htmlFor={`${attribute.code}-max`} className="sr-only">Maximum</Label>
-          <Input
-            id={`${attribute.code}-max`}
-            type="number"
-            min={range[0]}
             max={actualMax}
             step={step}
-            value={inputValues[1]}
-            onChange={(e) => handleInputChange(1, e.target.value)}
-            onBlur={handleInputBlur}
-            className="h-7 text-xs"
+            onValueChange={handleSliderChange}
+            className={cn(
+              "h-4", 
+              hasFilter ? "accent-primary" : ""
+            )}
           />
         </div>
-      </div>
-      
-      {/* Display available range info if different from base range */}
-      {(attribute.availableMinValue !== null || attribute.availableMaxValue !== null) && 
-       (attribute.availableMinValue !== attribute.minValue || attribute.availableMaxValue !== attribute.maxValue) && (
-        <div className="text-xs text-muted-foreground mt-1">
-          Range: {attribute.availableMinValue} - {attribute.availableMaxValue}
+        
+        <div className="bg-muted/20 p-2 rounded-md border border-border/40">
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <Label htmlFor={`${attribute.code}-min`} className="text-[10px] text-muted-foreground mb-1 block">
+                Minimum
+              </Label>
+              <Input
+                id={`${attribute.code}-min`}
+                type="number"
+                inputMode="decimal"
+                min={actualMin}
+                max={range[1]}
+                step={step}
+                value={inputValues[0]}
+                onChange={(e) => handleInputChange(0, e.target.value)}
+                onBlur={handleInputBlur}
+                className="h-7 text-xs"
+              />
+            </div>
+            
+            <div className="pt-5">
+              <ArrowRightCircle className="h-4 w-4 text-muted-foreground" />
+            </div>
+            
+            <div className="flex-1">
+              <Label htmlFor={`${attribute.code}-max`} className="text-[10px] text-muted-foreground mb-1 block">
+                Maximum
+              </Label>
+              <Input
+                id={`${attribute.code}-max`}
+                type="number"
+                inputMode="decimal"
+                min={range[0]}
+                max={actualMax}
+                step={step}
+                value={inputValues[1]}
+                onChange={(e) => handleInputChange(1, e.target.value)}
+                onBlur={handleInputBlur}
+                className="h-7 text-xs"
+              />
+            </div>
+          </div>
+          
+          {/* Display full range info */}
+          <div className="flex justify-between mt-1.5">
+            <span className="text-[10px] text-muted-foreground">Min: {actualMin}</span>
+            <span className="text-[10px] text-muted-foreground">Max: {actualMax}</span>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 } 

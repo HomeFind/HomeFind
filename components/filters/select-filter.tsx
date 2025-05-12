@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Tag, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
@@ -74,7 +74,7 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
   // Handle the display text for the button
   const getButtonText = () => {
     if (selectedOptions.length === 0) {
-      return "Select...";
+      return "Select options...";
     }
 
     if (attribute.isMultiple) {
@@ -96,9 +96,16 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
   });
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <div className="flex items-center justify-between mb-1">
-        <div className="text-xs font-medium">{attribute.name}</div>
+        <div className="text-xs font-medium flex items-center gap-1.5">
+          {attribute.name}
+          {selectedOptions.length > 0 && (
+            <Badge variant="outline" className="h-4 text-[10px] px-1.5 bg-muted/40 border-border/60">
+              {selectedOptions.length}
+            </Badge>
+          )}
+        </div>
         {selectedOptions.length > 0 && (
           <Button 
             variant="ghost" 
@@ -107,9 +114,9 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
               e.stopPropagation();
               clearSelection();
             }}
-            className="h-5 px-2 text-xs"
+            className="h-5 px-2 text-xs text-muted-foreground"
           >
-            Clear
+            Reset
           </Button>
         )}
       </div>
@@ -127,58 +134,71 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between font-normal h-8 text-xs"
+            className={cn(
+              "w-full justify-between font-normal h-9 text-xs relative border-border/60",
+              selectedOptions.length > 0 ? "bg-accent/10" : ""
+            )}
           >
-            {getButtonText()}
+            <span className="truncate">{getButtonText()}</span>
             <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 max-h-[250px] overflow-y-auto">
+        <PopoverContent className="w-[calc(100vw-40px)] p-0 max-h-[300px] overflow-y-auto">
           <Command>
             <CommandInput placeholder={`Search ${attribute.name.toLowerCase()}...`} className="h-8 text-xs" />
-            <CommandEmpty>No options found.</CommandEmpty>
-            <CommandGroup>
-              {filteredOptions?.map((option) => (
-                <CommandItem
-                  key={option.id}
-                  value={option.option_value}
-                  onSelect={() => handleOptionToggle(option.option_value)}
-                  disabled={attribute.availableOptions && !attribute.availableOptions.includes(option.option_value)}
-                  className={cn(
-                    "text-xs py-1",
-                    attribute.availableOptions && !attribute.availableOptions.includes(option.option_value) 
-                      ? "opacity-50 cursor-not-allowed" 
-                      : ""
-                  )}
-                >
-                  <Check
+            <CommandEmpty className="py-2 text-xs text-center">No options found</CommandEmpty>
+            <CommandGroup className="max-h-[240px] overflow-auto">
+              {filteredOptions?.map((option) => {
+                const isAvailable = !attribute.availableOptions || 
+                                    attribute.availableOptions.includes(option.option_value);
+                return (
+                  <CommandItem
+                    key={option.id}
+                    value={option.option_value}
+                    onSelect={() => isAvailable && handleOptionToggle(option.option_value)}
+                    disabled={!isAvailable}
                     className={cn(
-                      "mr-1 h-3 w-3",
-                      selectedOptions.includes(option.option_value) ? "opacity-100" : "opacity-0"
+                      "text-xs py-2 px-2",
+                      !isAvailable && "opacity-50 cursor-not-allowed"
                     )}
-                  />
-                  {option.option_value}
-                </CommandItem>
-              ))}
+                  >
+                    <div className={cn(
+                      "mr-2 h-3.5 w-3.5 flex items-center justify-center rounded-sm border border-primary/30",
+                      selectedOptions.includes(option.option_value) ? "bg-primary border-primary" : "opacity-50"
+                    )}>
+                      {selectedOptions.includes(option.option_value) && (
+                        <Check className="h-2.5 w-2.5 text-white" />
+                      )}
+                    </div>
+                    <span className="flex-1">{option.option_value}</span>
+                    {/* Show count only if available */}
+                    {(option as any).count !== undefined && (
+                      <span className="ml-auto text-xs opacity-70">({(option as any).count})</span>
+                    )}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </Command>
         </PopoverContent>
       </Popover>
 
       {attribute.isMultiple && selectedOptions.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1">
+        <div className="flex flex-wrap gap-1.5 mt-2">
           {selectedOptions.map((option) => (
             <Badge 
               key={option} 
               variant="secondary"
-              className="text-xs py-0 px-1" 
+              className="text-xs py-0.5 px-2 rounded-full flex items-center gap-1 bg-accent/20 hover:bg-accent/30" 
             >
+              <Tag className="h-2.5 w-2.5" />
               {option}
               <button 
-                className="ml-1 rounded-full outline-none"
+                className="rounded-full w-3.5 h-3.5 bg-muted/70 hover:bg-muted flex items-center justify-center ml-0.5"
                 onClick={() => handleOptionToggle(option)}
+                aria-label={`Remove ${option}`}
               >
-                ×
+                <X className="h-2 w-2" />
               </button>
             </Badge>
           ))}
