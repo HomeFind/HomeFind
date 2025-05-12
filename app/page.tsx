@@ -10,11 +10,18 @@ export default function HomePage() {
       <p className="text-xl text-muted-foreground text-center mb-8 max-w-2xl">
         Discover properties with our advanced filtering system - easily find what you're looking for using our powerful filters
       </p>
-      <Link href="/listings" passHref>
-        <Button size="lg" className="px-8">
-          Browse Listings
-        </Button>
-      </Link>
+      <div className="flex gap-4">
+        <Link href="/listings" passHref>
+          <Button size="lg" className="px-8">
+            Browse Listings
+          </Button>
+        </Link>
+        <Link href="/filters" passHref>
+          <Button size="lg" variant="outline" className="px-8">
+            Explore Filters
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

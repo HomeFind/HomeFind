@@ -11,7 +11,7 @@ interface FilterContextType {
   applyFilters: () => void;
 }
 
-const FilterContext = createContext<FilterContextType | undefined>(undefined);
+export const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 // This component uses useSearchParams and should be wrapped in Suspense
 export function FilterProviderWithSearchParams({ children }: { children: ReactNode }) {
