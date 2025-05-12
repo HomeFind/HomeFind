@@ -60,31 +60,10 @@ export function AppliedFilters({ listingCount, loading = false }: AppliedFilters
   };
   
   return (
-    <div className="mb-4 bg-muted/30 p-3 rounded-md">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm">
-          {listingCount > 0 ? (
-            <span>Found <strong>{listingCount}</strong> {listingCount === 1 ? 'property' : 'properties'}</span>
-          ) : (
-            <span>No properties found</span>
-          )}
-        </div>
-        
-        {filters.length > 0 && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-xs h-7 px-2"
-            onClick={handleClearAll}
-          >
-            Clear All
-          </Button>
-        )}
-      </div>
-      
+    <div className="mb-3 bg-muted/30 p-2 rounded-md text-sm">
       {filters.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          <span className="text-sm text-muted-foreground py-1">Filters:</span>
+        <div className="flex flex-wrap gap-1 mt-1">
+          <span className="text-xs text-muted-foreground py-1">Filters:</span>
           {filters.map((filter) => (
             <Badge 
               key={filter.attributeCode} 

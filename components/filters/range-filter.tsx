@@ -162,22 +162,22 @@ export function RangeFilter({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium">{attribute.name}</div>
+        <div className="text-xs font-medium">{attribute.name}</div>
         {hasFilter && (
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={clearFilter}
-            className="h-6 px-2 text-xs"
+            className="h-5 px-2 text-xs"
           >
             Clear
           </Button>
         )}
       </div>
       
-      <div className="pt-4 px-2">
+      <div className="pt-2 px-1">
         <Slider
           defaultValue={[actualMin, actualMax]}
           value={[range[0], range[1]]}
@@ -185,11 +185,11 @@ export function RangeFilter({
           max={actualMax}
           step={step}
           onValueChange={handleSliderChange}
-          className="my-6"
+          className="my-4"
         />
       </div>
       
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2">
         <div className="flex-1">
           <Label htmlFor={`${attribute.code}-min`} className="sr-only">Minimum</Label>
           <Input
@@ -201,10 +201,10 @@ export function RangeFilter({
             value={inputValues[0]}
             onChange={(e) => handleInputChange(0, e.target.value)}
             onBlur={handleInputBlur}
-            className="h-8"
+            className="h-7 text-xs"
           />
         </div>
-        <span className="text-sm text-muted-foreground">to</span>
+        <span className="text-xs text-muted-foreground">to</span>
         <div className="flex-1">
           <Label htmlFor={`${attribute.code}-max`} className="sr-only">Maximum</Label>
           <Input
@@ -216,7 +216,7 @@ export function RangeFilter({
             value={inputValues[1]}
             onChange={(e) => handleInputChange(1, e.target.value)}
             onBlur={handleInputBlur}
-            className="h-8"
+            className="h-7 text-xs"
           />
         </div>
       </div>
@@ -225,7 +225,7 @@ export function RangeFilter({
       {(attribute.availableMinValue !== null || attribute.availableMaxValue !== null) && 
        (attribute.availableMinValue !== attribute.minValue || attribute.availableMaxValue !== attribute.maxValue) && (
         <div className="text-xs text-muted-foreground mt-1">
-          Available range: {attribute.availableMinValue} - {attribute.availableMaxValue}
+          Range: {attribute.availableMinValue} - {attribute.availableMaxValue}
         </div>
       )}
     </div>

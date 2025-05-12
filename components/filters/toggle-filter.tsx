@@ -57,31 +57,31 @@ export function ToggleFilter({ attribute, onInteraction }: ToggleFilterProps) {
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm font-medium">{attribute.name}</div>
+    <div className="space-y-1">
+      <div className="flex items-center justify-between mb-1">
+        <div className="text-xs font-medium">{attribute.name}</div>
         {checked !== null && (
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={clearFilter}
-            className="h-6 px-2 text-xs"
+            className="h-5 px-2 text-xs"
           >
             Clear
           </Button>
         )}
       </div>
       
-      <div className="flex items-center justify-between pt-2 border rounded-md p-3">
-        <Label htmlFor={`${attribute.code}-toggle`} className="text-sm cursor-pointer">
+      <div className="flex items-center justify-between pt-1 border rounded-md p-2">
+        <Label htmlFor={`${attribute.code}-toggle`} className="text-xs cursor-pointer">
           {checked === true ? "Yes" : checked === false ? "No" : "Any"}
         </Label>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button 
             variant={checked === false ? "default" : "outline"} 
             size="sm"
             onClick={() => handleToggleChange(false)}
-            className="h-8 px-3"
+            className="h-7 px-2 text-xs"
             disabled={!isOptionAvailable(false)}
           >
             No
@@ -90,7 +90,7 @@ export function ToggleFilter({ attribute, onInteraction }: ToggleFilterProps) {
             variant={checked === true ? "default" : "outline"} 
             size="sm"
             onClick={() => handleToggleChange(true)}
-            className="h-8 px-3"
+            className="h-7 px-2 text-xs"
             disabled={!isOptionAvailable(true)}
           >
             Yes

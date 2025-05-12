@@ -166,14 +166,14 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
 
   return (
     <Card className={`overflow-hidden shadow-md ${className}`}>
-      <CardHeader className="px-4 py-3 bg-muted/50">
+      <CardHeader className="px-3 py-2 bg-muted/50">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Sliders className="h-5 w-5" />
+          <CardTitle className="text-base flex items-center gap-1">
+            <Sliders className="h-4 w-4" />
             Filters
           </CardTitle>
           {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-7 w-7">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </Button>
@@ -182,23 +182,23 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
       </CardHeader>
       
       {loading ? (
-        <CardContent className="p-4">
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+        <CardContent className="p-3">
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="space-y-2">
-                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-8 w-full" />
               </div>
             ))}
           </div>
         </CardContent>
       ) : (
-        <ScrollArea className="h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">
-          <CardContent className="p-4">
-            <div className="space-y-4">
+        <ScrollArea className="h-[calc(100vh-10rem)] max-h-[500px]">
+          <CardContent className="p-3">
+            <div className="space-y-3">
               {attributes.map((attribute) => (
                 <div 
                   key={attribute.code} 
-                  className="mb-4"
+                  className="mb-3"
                   onFocus={() => handleAttributeInteraction(attribute.code)}
                   onClick={() => handleAttributeInteraction(attribute.code)}
                 >
@@ -207,7 +207,7 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
                     onInteraction={() => handleAttributeInteraction(attribute.code)} 
                   />
                   {attributes.indexOf(attribute) < attributes.length - 1 && (
-                    <Separator className="mt-4" />
+                    <Separator className="mt-3" />
                   )}
                 </div>
               ))}
@@ -216,12 +216,13 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
         </ScrollArea>
       )}
       
-      <CardFooter className="px-4 py-3 bg-muted/50 flex justify-between">
+      <CardFooter className="px-3 py-2 bg-muted/50 flex justify-between">
         <Button
           variant="ghost"
           size="sm"
           onClick={handleClearFilters}
           disabled={!hasPendingFilters}
+          className="h-8 text-xs"
         >
           Clear All
         </Button>
@@ -229,6 +230,7 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
           size="sm"
           onClick={handleApplyFilters}
           disabled={!hasFilterChanges}
+          className="h-8 text-xs"
         >
           Apply Filters
         </Button>

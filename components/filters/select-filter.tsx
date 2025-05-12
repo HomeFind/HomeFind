@@ -97,8 +97,8 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm font-medium">{attribute.name}</div>
+      <div className="flex items-center justify-between mb-1">
+        <div className="text-xs font-medium">{attribute.name}</div>
         {selectedOptions.length > 0 && (
           <Button 
             variant="ghost" 
@@ -107,7 +107,7 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
               e.stopPropagation();
               clearSelection();
             }}
-            className="h-6 px-2 text-xs"
+            className="h-5 px-2 text-xs"
           >
             Clear
           </Button>
@@ -127,15 +127,15 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between font-normal"
+            className="w-full justify-between font-normal h-8 text-xs"
           >
             {getButtonText()}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className="w-full p-0 max-h-[250px] overflow-y-auto">
           <Command>
-            <CommandInput placeholder={`Search ${attribute.name.toLowerCase()}...`} />
+            <CommandInput placeholder={`Search ${attribute.name.toLowerCase()}...`} className="h-8 text-xs" />
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
               {filteredOptions?.map((option) => (
@@ -145,6 +145,7 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
                   onSelect={() => handleOptionToggle(option.option_value)}
                   disabled={attribute.availableOptions && !attribute.availableOptions.includes(option.option_value)}
                   className={cn(
+                    "text-xs py-1",
                     attribute.availableOptions && !attribute.availableOptions.includes(option.option_value) 
                       ? "opacity-50 cursor-not-allowed" 
                       : ""
@@ -152,7 +153,7 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-1 h-3 w-3",
                       selectedOptions.includes(option.option_value) ? "opacity-100" : "opacity-0"
                     )}
                   />
@@ -165,16 +166,16 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
       </Popover>
 
       {attribute.isMultiple && selectedOptions.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2">
+        <div className="flex flex-wrap gap-1 mt-1">
           {selectedOptions.map((option) => (
             <Badge 
               key={option} 
               variant="secondary"
-              className="text-xs" 
+              className="text-xs py-0 px-1" 
             >
               {option}
               <button 
-                className="ml-1 rounded-full outline-none focus:ring-2 focus:ring-offset-1"
+                className="ml-1 rounded-full outline-none"
                 onClick={() => handleOptionToggle(option)}
               >
                 ×

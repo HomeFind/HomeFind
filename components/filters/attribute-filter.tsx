@@ -14,19 +14,29 @@ export function AttributeFilter({ attribute, onInteraction }: AttributeFilterPro
   switch (attribute.type) {
     case 'NUMBER':
       return (
-        <RangeFilter 
-          attribute={attribute} 
-          min={attribute.minValue ?? 0} 
-          max={attribute.maxValue ?? 100}
-          onInteraction={onInteraction}
-        />
+        <div className="text-sm">
+          <RangeFilter 
+            attribute={attribute} 
+            min={attribute.minValue ?? 0} 
+            max={attribute.maxValue ?? 100}
+            onInteraction={onInteraction}
+          />
+        </div>
       );
     
     case 'BOOLEAN':
-      return <ToggleFilter attribute={attribute} onInteraction={onInteraction} />;
+      return (
+        <div className="text-sm">
+          <ToggleFilter attribute={attribute} onInteraction={onInteraction} />
+        </div>
+      );
     
     case 'ENUM':
-      return <SelectFilter attribute={attribute} onInteraction={onInteraction} />;
+      return (
+        <div className="text-sm">
+          <SelectFilter attribute={attribute} onInteraction={onInteraction} />
+        </div>
+      );
     
     default:
       // Skip all other attribute types
