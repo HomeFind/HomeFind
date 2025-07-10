@@ -43,4 +43,5 @@ next-env.d.ts
 
 # IDE files
 /.cursor
+/.claude
 /.mcp.json
