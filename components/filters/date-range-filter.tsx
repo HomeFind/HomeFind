@@ -1,3 +1,6 @@
+// TODO [DEPRECATED]: This component is not used in the current static filters implementation
+// Date filtering is not part of the current requirements. This file can be safely removed.
+
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';

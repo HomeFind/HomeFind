@@ -1,3 +1,6 @@
+// TODO [DEPRECATED]: This component has been replaced by inline SelectFilter in StaticFiltersPanel
+// This file can be safely removed in a future cleanup.
+
 import React, { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown, Tag, X } from 'lucide-react';
 import { cn } from '@/lib/utils';

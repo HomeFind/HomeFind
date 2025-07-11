@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Sliders } from 'lucide-react';
-import { FiltersPanel } from './filters-panel';
+import { StaticFiltersPanel } from './static-filters-panel';
 
 interface MobileFilterDialogProps {
   triggerClassName?: string;
@@ -24,7 +24,7 @@ export function MobileFilterDialog({ triggerClassName }: MobileFilterDialogProps
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-0 h-[90vh] max-h-screen overflow-hidden">
-        <FiltersPanel 
+        <StaticFiltersPanel 
           onClose={() => setOpen(false)} 
           className="border-none shadow-none rounded-none h-full"
         />

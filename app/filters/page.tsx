@@ -1,3 +1,7 @@
+// TODO [DEPRECATED]: This page is no longer used. 
+// Filter functionality has been moved to StaticFiltersPanel in /listings
+// This file can be safely removed in a future cleanup.
+
 'use client';
 
 import React, { Suspense } from 'react';

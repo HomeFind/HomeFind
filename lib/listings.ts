@@ -72,6 +72,18 @@ export async function getListingsWithImages(
   // Parse the result
   const result = data as PaginatedListingsResult;
   
+  // Log the raw result for debugging
+  console.log('Raw database result:', result);
+  
+  // Handle case where data might be null or undefined
+  if (!result || !result.data) {
+    console.log('No data found or result is null, returning empty result');
+    return {
+      listings: [],
+      pagination: { total: 0, currentPage: page, totalPages: 0 }
+    };
+  }
+  
   // Transform into the expected format
   const listings = result.data.map(item => ({
     listing: {
@@ -90,9 +102,9 @@ export async function getListingsWithImages(
   return {
     listings,
     pagination: {
-      total: result.total,
-      currentPage: result.page,
-      totalPages: result.total_pages
+      total: result.total ?? 0,
+      currentPage: result.page ?? page,
+      totalPages: result.total_pages ?? 0
     }
   };
 }

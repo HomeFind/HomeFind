@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import Image from 'next/image';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { ListingItemType } from '@/lib/database.types';

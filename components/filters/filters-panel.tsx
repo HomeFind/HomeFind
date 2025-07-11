@@ -1,3 +1,4 @@
+// TODO [DEPRECATED]: This component has been replaced by StaticFiltersPanel
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { X, Sliders, SearchIcon, Check, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ interface FiltersPanelProps {
   isOpen?: boolean;
 }
 
+// TODO [DEPRECATED]: This component has been replaced by StaticFiltersPanel
 export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanelProps) {
   const { clearFilters, applyFilters, filters, pendingFilters } = useFilters();
   const [attributes, setAttributes] = useState<AttributeFilterType[]>([]);

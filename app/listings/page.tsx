@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
-import { FiltersPanel, FilterProvider, FilterProviderWithSearchParams, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
+import { FilterProvider, FilterProviderWithSearchParams, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
+import { StaticFiltersPanel } from '@/components/filters/static-filters-panel';
 import { ListingItem } from '@/components/listing-item';
 import { getListingsWithImages } from '@/lib/listings';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -211,13 +212,13 @@ function FiltersLoading() {
 
 export default function ListingsPage() {
   return (
-    <div className="container mx-auto py-8">
+    <div className="w-full max-w-none px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 py-8">
       <Suspense fallback={<FiltersLoading />}>
         <FilterProviderWithSearchParams>
           <div className="flex flex-col md:flex-row gap-6">
             {/* Sidebar Filter Panel - Visible on desktop */}
             <div className="hidden md:block w-full md:w-80 shrink-0">
-              <FiltersPanel />
+              <StaticFiltersPanel />
             </div>
             
             {/* Main Content */}
