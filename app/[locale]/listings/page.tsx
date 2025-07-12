@@ -9,9 +9,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { FilterValue } from '@/lib/database.types';
+import { useTranslations } from 'next-intl';
 
 function ListingsContent() {
   const { filters } = useFilters();
+  const t = useTranslations('listings');
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<Array<{
     listing: any,
@@ -23,7 +25,7 @@ function ListingsContent() {
     currentPage: 1,
     totalPages: 0
   });
-  
+
   // Track filters in a ref to detect changes
   const filtersRef = useRef<FilterValue[]>([]);
   // Track if initial fetch has been done
@@ -44,11 +46,11 @@ function ListingsContent() {
   useEffect(() => {
     // Skip the initial render since we have a separate effect for that
     if (!initialFetchDoneRef.current) return;
-    
+
     // Convert filters to JSON string for comparison
     const currentFiltersJson = JSON.stringify(filters);
     const previousFiltersJson = JSON.stringify(filtersRef.current);
-    
+
     // Only fetch if filters have changed - deep comparison
     if (currentFiltersJson !== previousFiltersJson) {
       console.log('Filters changed, fetching new listings:', filters);
@@ -63,21 +65,21 @@ function ListingsContent() {
     setLoading(true);
     try {
       console.log('Fetching listings with filters:', filters);
-      
+
       // Check if filters is a valid array
       if (!Array.isArray(filters)) {
         console.error('Filters is not an array:', filters);
         throw new Error('Invalid filters format');
       }
-      
+
       const result = await getListingsWithImages(filters, page);
       console.log('Fetched listings result:', result);
-      
+
       if (!result.listings) {
         console.error('No listings data returned');
         throw new Error('No listings data returned');
       }
-      
+
       setListings(result.listings);
       setPagination(result.pagination);
     } catch (error) {
@@ -103,17 +105,17 @@ function ListingsContent() {
   return (
     <>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Property Listings</h1>
-        
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
+
         {/* Mobile Filter Button - Opens filter dialog on mobile */}
         <div className="md:hidden">
           <MobileFilterDialog />
         </div>
       </div>
-      
+
       {/* Applied Filters and Listing Count */}
       <AppliedFilters listingCount={pagination.total} loading={loading} />
-      
+
       {loading ? (
         // Skeleton loader while listings are being fetched
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -135,39 +137,39 @@ function ListingsContent() {
           {/* Display actual listings */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {listings.map(({ listing, images, attributes }) => (
-              <ListingItem 
-                key={listing.id} 
-                listing={listing} 
-                images={images} 
+              <ListingItem
+                key={listing.id}
+                listing={listing}
+                images={images}
                 attributes={attributes}
               />
             ))}
           </div>
-          
+
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className="flex justify-center items-center mt-8 space-x-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(pagination.currentPage - 1)}
                 disabled={pagination.currentPage <= 1}
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
+                {t('previous')}
               </Button>
-              
+
               <div className="text-sm">
-                Page {pagination.currentPage} of {pagination.totalPages}
+                {t('page')} {pagination.currentPage} {t('of')} {pagination.totalPages}
               </div>
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => handlePageChange(pagination.currentPage + 1)}
                 disabled={pagination.currentPage >= pagination.totalPages}
               >
-                Next
+                {t('next')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -176,9 +178,9 @@ function ListingsContent() {
       ) : (
         // No listings found message
         <div className="text-center py-12">
-          <h3 className="text-lg font-medium">No listings found</h3>
+          <h3 className="text-lg font-medium">{t('noListingsFound')}</h3>
           <p className="text-muted-foreground mt-2">
-            Try adjusting your filters to find what you're looking for.
+            {t('noListingsDescription')}
           </p>
         </div>
       )}
@@ -220,7 +222,7 @@ export default function ListingsPage() {
             <div className="hidden md:block w-full md:w-80 shrink-0">
               <StaticFiltersPanel />
             </div>
-            
+
             {/* Main Content */}
             <div className="flex-1">
               <ListingsContent />

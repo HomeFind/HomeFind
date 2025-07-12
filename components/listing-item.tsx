@@ -10,6 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { useTranslations } from 'next-intl';
 
 interface ListingItemProps {
   listing: ListingItemType;
@@ -50,6 +51,7 @@ const formatDate = (dateString: string): string => {
 
 export function ListingItem({ listing, images, attributes = {} }: ListingItemProps) {
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const t = useTranslations('listings');
 
   // Format attribute names for display (convert snake_case or camelCase to Title Case)
   // const formatAttributeName = (name: string): string => {
@@ -67,7 +69,7 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
   //   ...(attributes?.living_area ? [['living_area', attributes.living_area]] : []),
   //   ...(attributes?.total_area ? [['total_area', attributes.total_area]] : []),
   //   ...(attributes?.floor ? [['floor', attributes.floor]] : []),
-    
+
   //   // Then all other attributes sorted alphabetically
   //   ...Object.entries(attributes || {})
   //     .filter(([key]) => !['number_of_rooms', 'living_area', 'total_area', 'floor', 'housing_type', 'renovation'].includes(key))
@@ -81,7 +83,7 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
           <CarouselContent>
             {images.map((imageUrl, index) => (
               <CarouselItem key={index}>
-                <AspectRatio ratio={16/9}>
+                <AspectRatio ratio={16 / 9}>
                   {isValidImageUrl(imageUrl) && !imageErrors[index] ? (
                     <div className="relative w-full h-full">
                       <img
@@ -93,7 +95,7 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
                     </div>
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <span className="text-muted-foreground">Image unavailable</span>
+                      <span className="text-muted-foreground">{t('imageUnavailable')}</span>
                     </div>
                   )}
                 </AspectRatio>
@@ -108,9 +110,9 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
           )}
         </Carousel>
       ) : (
-        <AspectRatio ratio={16/9}>
+        <AspectRatio ratio={16 / 9}>
           <div className="w-full h-full bg-muted flex items-center justify-center">
-            <span className="text-muted-foreground">No image available</span>
+            <span className="text-muted-foreground">{t('noImageAvailable')}</span>
           </div>
         </AspectRatio>
       )}
@@ -130,31 +132,31 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
           <div className="grid grid-cols-1 gap-1">
             {attributes?.total_area && (
               <div className="flex items-start text-xs">
-                <span className="text-muted-foreground min-w-[120px]">Total area:</span>
+                <span className="text-muted-foreground min-w-[120px]">{t('totalArea')}:</span>
                 <span className="font-medium truncate">{attributes.total_area}m²</span>
               </div>
             )}
             {attributes?.building_type && (
               <div className="flex items-start text-xs">
-                <span className="text-muted-foreground min-w-[120px]">Building type:</span>
+                <span className="text-muted-foreground min-w-[120px]">{t('buildingType')}:</span>
                 <span className="font-medium truncate">{attributes.building_type}</span>
               </div>
             )}
             {attributes?.housing_type && (
               <div className="flex items-start text-xs">
-                <span className="text-muted-foreground min-w-[120px]">Housing type:</span>
+                <span className="text-muted-foreground min-w-[120px]">{t('housingType')}:</span>
                 <span className="font-medium truncate">{attributes.housing_type}</span>
               </div>
             )}
             {attributes?.ad_type && (
               <div className="flex items-start text-xs">
-                <span className="text-muted-foreground min-w-[120px]">Ad type:</span>
+                <span className="text-muted-foreground min-w-[120px]">{t('adType')}:</span>
                 <span className="font-medium truncate">{attributes.ad_type}</span>
               </div>
             )}
             {listing.created_at && (
               <div className="flex items-start text-xs">
-                <span className="text-muted-foreground min-w-[120px]">Created at:</span>
+                <span className="text-muted-foreground min-w-[120px]">{t('createdAt')}:</span>
                 <span className="font-medium truncate">{formatDate(listing.created_at)}</span>
               </div>
             )}
@@ -164,7 +166,7 @@ export function ListingItem({ listing, images, attributes = {} }: ListingItemPro
 
       <CardFooter className="p-4 pt-0 flex justify-between">
         <span className="font-medium text-primary">
-          {listing.price ? `$${listing.price.toLocaleString()}` : 'Price on request'}
+          {listing.price ? `$${listing.price.toLocaleString()}` : t('priceOnRequest')}
         </span>
 
         {attributes?.district && (

@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { getAttributesWithOptions } from '@/lib/attributes';
 import { AttributeFilter } from '@/lib/database.types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslations } from 'next-intl';
 
 interface StaticFiltersPanelProps {
   className?: string;
@@ -24,7 +25,7 @@ interface StaticFiltersPanelProps {
 // Define the static filter codes in the required order
 const STATIC_FILTER_CODES = [
   'number_of_rooms',
-  'price', 
+  'price',
   'total_area',
   'district',
   'building_type',
@@ -33,23 +34,24 @@ const STATIC_FILTER_CODES = [
 ];
 
 // Range component for number filters (without slider)
-function RangeFilter({ 
+function RangeFilter({
   attribute,
   onInteraction
-}: { 
+}: {
   attribute: AttributeFilter;
   onInteraction?: () => void;
 }) {
   const { pendingFilters, setFilter, removeFilter } = useFilters();
+  const t = useTranslations('filters');
   const min = attribute.availableMinValue ?? attribute.minValue ?? 0;
   const max = attribute.availableMaxValue ?? attribute.maxValue ?? 100;
-  
+
   const [range, setRange] = useState<[number | null, number | null]>([null, null]);
   const [inputValues, setInputValues] = useState<[string, string]>(['', '']);
-  
+
   const existingFilter = pendingFilters.find(f => f.attributeCode === attribute.code);
   const hasFilter = existingFilter && Array.isArray(existingFilter.value);
-  
+
   React.useEffect(() => {
     if (existingFilter && Array.isArray(existingFilter.value)) {
       const filterValue = existingFilter.value as [number, number];
@@ -64,18 +66,18 @@ function RangeFilter({
 
   const handleInputChange = (index: 0 | 1, value: string) => {
     if (onInteraction) onInteraction();
-    
+
     const newInputValues: [string, string] = [...inputValues] as [string, string];
     newInputValues[index] = value;
     setInputValues(newInputValues);
-    
+
     if (isNaN(Number(value)) || value === '') {
       const newRange: [number | null, number | null] = [...range];
       newRange[index] = null;
       setRange(newRange);
       return;
     }
-    
+
     const newRange: [number | null, number | null] = [...range];
     newRange[index] = Number(value);
     setRange(newRange);
@@ -123,16 +125,16 @@ function RangeFilter({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="text-xs font-medium flex items-center gap-1.5">
-          {attribute.name}
+          {t(`attributes.${attribute.code}`) || attribute.name}
         </div>
         {hasFilter && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={clearFilter}
             className="h-5 px-2 text-xs text-muted-foreground"
           >
-            Reset
+            {t('reset')}
           </Button>
         )}
       </div>
@@ -141,7 +143,7 @@ function RangeFilter({
         <div className="flex items-center gap-2">
           <div className="flex-1">
             <Label htmlFor={`${attribute.code}-min`} className="text-[10px] text-muted-foreground mb-1 block">
-              Minimum
+              {t('minimum')}
             </Label>
             <Input
               id={`${attribute.code}-min`}
@@ -152,17 +154,17 @@ function RangeFilter({
               onChange={(e) => handleInputChange(0, e.target.value)}
               onBlur={handleInputBlur}
               className="h-7 text-xs"
-              placeholder="Min"
+              placeholder={t('min')}
             />
           </div>
-          
+
           <div className="pt-5">
             <ArrowRightCircle className="h-4 w-4 text-muted-foreground" />
           </div>
-          
+
           <div className="flex-1">
             <Label htmlFor={`${attribute.code}-max`} className="text-[10px] text-muted-foreground mb-1 block">
-              Maximum
+              {t('maximum')}
             </Label>
             <Input
               id={`${attribute.code}-max`}
@@ -173,14 +175,14 @@ function RangeFilter({
               onChange={(e) => handleInputChange(1, e.target.value)}
               onBlur={handleInputBlur}
               className="h-7 text-xs"
-              placeholder="Max"
+              placeholder={t('max')}
             />
           </div>
         </div>
-        
+
         <div className="flex justify-between mt-1.5">
-          <span className="text-[10px] text-muted-foreground">Min: {formatValue(min)}</span>
-          <span className="text-[10px] text-muted-foreground">Max: {formatValue(max)}</span>
+          <span className="text-[10px] text-muted-foreground">{t('min')}: {formatValue(min)}</span>
+          <span className="text-[10px] text-muted-foreground">{t('max')}: {formatValue(max)}</span>
         </div>
       </div>
     </div>
@@ -188,14 +190,15 @@ function RangeFilter({
 }
 
 // Select component for enum filters
-function SelectFilter({ 
+function SelectFilter({
   attribute,
   onInteraction
-}: { 
+}: {
   attribute: AttributeFilter;
   onInteraction?: () => void;
 }) {
   const { setFilter, pendingFilters, removeFilter } = useFilters();
+  const t = useTranslations('filters');
   const [open, setOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [dropdownWidth, setDropdownWidth] = useState<number | undefined>(undefined);
@@ -203,14 +206,14 @@ function SelectFilter({
 
   const existingFilter = pendingFilters.find(f => f.attributeCode === attribute.code);
   const isMultiple = attribute.isMultiple !== false; // Default to true for most filters
-  
+
   // Update dropdown width when trigger ref changes
   React.useEffect(() => {
     if (triggerRef.current) {
       setDropdownWidth(triggerRef.current.offsetWidth);
     }
   }, [open]);
-  
+
   React.useEffect(() => {
     if (existingFilter) {
       if (Array.isArray(existingFilter.value)) {
@@ -226,7 +229,7 @@ function SelectFilter({
 
   const handleOptionToggle = (optionValue: string) => {
     if (onInteraction) onInteraction();
-    
+
     let newSelectedOptions: string[];
 
     if (isMultiple) {
@@ -260,11 +263,11 @@ function SelectFilter({
 
   const getButtonText = () => {
     if (selectedOptions.length === 0) {
-      return "Select options...";
+      return t('selectOptions');
     }
 
     if (isMultiple) {
-      return `${selectedOptions.length} selected`;
+      return `${selectedOptions.length}${t('selected')}`;
     }
 
     return selectedOptions[0];
@@ -282,7 +285,7 @@ function SelectFilter({
     <div className="space-y-2">
       <div className="flex items-center justify-between mb-1">
         <div className="text-xs font-medium flex items-center gap-1.5">
-          {attribute.name}
+          {t(`attributes.${attribute.code}`) || attribute.name}
           {selectedOptions.length > 0 && (
             <Badge variant="outline" className="h-4 text-[10px] px-1.5 bg-muted/40 border-border/60">
               {selectedOptions.length}
@@ -290,13 +293,13 @@ function SelectFilter({
           )}
         </div>
         {selectedOptions.length > 0 && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={clearSelection}
             className="h-5 px-2 text-xs text-muted-foreground"
           >
-            Reset
+            {t('reset')}
           </Button>
         )}
       </div>
@@ -317,18 +320,18 @@ function SelectFilter({
             <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent 
+        <PopoverContent
           className="p-0 max-h-[300px] overflow-y-auto"
           style={{ width: dropdownWidth }}
           align="start"
         >
           <Command>
-            <CommandInput placeholder={`Search ${attribute.name.toLowerCase()}...`} className="h-8 text-xs" />
-            <CommandEmpty className="py-2 text-xs text-center">No options found</CommandEmpty>
+            <CommandInput placeholder={`${t('search')} ${(t(`attributes.${attribute.code}`) || attribute.name).toLowerCase()}...`} className="h-8 text-xs" />
+            <CommandEmpty className="py-2 text-xs text-center">{t('noOptionsFound')}</CommandEmpty>
             <CommandGroup className="max-h-[240px] overflow-auto">
               {filteredOptions?.map((option) => {
-                const isAvailable = !attribute.availableOptions || 
-                                    attribute.availableOptions.includes(option.option_value);
+                const isAvailable = !attribute.availableOptions ||
+                  attribute.availableOptions.includes(option.option_value);
                 return (
                   <CommandItem
                     key={option.id}
@@ -360,17 +363,17 @@ function SelectFilter({
       {isMultiple && selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
           {selectedOptions.map((option) => (
-            <Badge 
-              key={option} 
+            <Badge
+              key={option}
               variant="secondary"
-              className="text-xs py-0.5 px-2 rounded-full flex items-center gap-1 bg-accent/20 hover:bg-accent/30" 
+              className="text-xs py-0.5 px-2 rounded-full flex items-center gap-1 bg-accent/20 hover:bg-accent/30"
             >
               <Tag className="h-2.5 w-2.5" />
               {option}
-              <button 
+              <button
                 className="rounded-full w-3.5 h-3.5 bg-muted/70 hover:bg-muted flex items-center justify-center ml-0.5"
                 onClick={() => handleOptionToggle(option)}
-                aria-label={`Remove ${option}`}
+                aria-label={`${t('remove')} ${option}`}
               >
                 <XIcon className="h-2 w-2" />
               </button>
@@ -384,6 +387,7 @@ function SelectFilter({
 
 export function StaticFiltersPanel({ className, onClose, isOpen = true }: StaticFiltersPanelProps) {
   const { clearFilters, applyFilters, filters, pendingFilters } = useFilters();
+  const t = useTranslations('filters');
   const [attributes, setAttributes] = useState<Map<string, AttributeFilter>>(new Map());
   const [loading, setLoading] = useState(true);
   const [activeAttribute, setActiveAttribute] = useState<string | undefined>(undefined);
@@ -395,7 +399,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
       setLoading(true);
       try {
         const attributesData = await getAttributesWithOptions([], undefined);
-        
+
         // Create a map of attributes by code
         const attributeMap = new Map<string, AttributeFilter>();
         attributesData.forEach(attr => {
@@ -403,7 +407,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
             attributeMap.set(attr.code, attr);
           }
         });
-        
+
         setAttributes(attributeMap);
         setInitialLoadComplete(true);
       } catch (error) {
@@ -421,11 +425,11 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
   // Only refresh when filters are actually applied (not on pending changes)
   useEffect(() => {
     if (!initialLoadComplete) return;
-    
+
     const fetchUpdatedAttributes = async () => {
       try {
         const attributesData = await getAttributesWithOptions(filters, undefined);
-        
+
         // Update attributes while preserving existing state
         setAttributes(prevAttributes => {
           const newAttributes = new Map(prevAttributes);
@@ -488,16 +492,16 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
         <div className="flex items-center justify-between mb-3">
           <CardTitle className="text-base flex items-center gap-1.5">
             <Settings2 className="h-4 w-4" />
-            Property Filters
+            {t('propertyFilters')}
           </CardTitle>
           {onClose && (
             <Button variant="ghost" size="icon" onClick={onClose} className="h-7 w-7 rounded-full">
               <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{t('close')}</span>
             </Button>
           )}
         </div>
-        
+
         {/* Action Buttons moved to top */}
         <div className="flex justify-between">
           <Button
@@ -507,7 +511,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
             disabled={!hasPendingFilters}
             className="h-9 text-xs"
           >
-            Reset
+            {t('reset')}
           </Button>
           <Button
             size="sm"
@@ -515,7 +519,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
             disabled={!hasFilterChanges}
             className="h-9 text-xs gap-1.5 relative"
           >
-            Apply Filters
+            {t('apply')}
             {activeFilterCount > 0 && (
               <span className="bg-primary-foreground text-primary rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-medium">
                 {activeFilterCount}
@@ -524,45 +528,45 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
           </Button>
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-3">
         {loading ? (
-            <div className="space-y-4 animate-pulse">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="h-4 w-1/3 bg-muted rounded-md"></div>
-                  <div className="h-8 bg-muted/60 rounded-md"></div>
+          <div className="space-y-4 animate-pulse">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-4 w-1/3 bg-muted rounded-md"></div>
+                <div className="h-8 bg-muted/60 rounded-md"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {STATIC_FILTER_CODES.map((code, index) => {
+              const attribute = attributes.get(code);
+              if (!attribute) return null;
+
+              return (
+                <div key={code}>
+                  {attribute.type === 'NUMBER' ? (
+                    <RangeFilter
+                      attribute={attribute}
+                      onInteraction={() => handleAttributeInteraction(code)}
+                    />
+                  ) : (
+                    <SelectFilter
+                      attribute={attribute}
+                      onInteraction={() => handleAttributeInteraction(code)}
+                    />
+                  )}
+
+                  {index < STATIC_FILTER_CODES.length - 1 && (
+                    <Separator className="mt-4" />
+                  )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {STATIC_FILTER_CODES.map((code, index) => {
-                const attribute = attributes.get(code);
-                if (!attribute) return null;
-                
-                return (
-                  <div key={code}>
-                    {attribute.type === 'NUMBER' ? (
-                      <RangeFilter 
-                        attribute={attribute}
-                        onInteraction={() => handleAttributeInteraction(code)}
-                      />
-                    ) : (
-                      <SelectFilter 
-                        attribute={attribute}
-                        onInteraction={() => handleAttributeInteraction(code)}
-                      />
-                    )}
-                    
-                    {index < STATIC_FILTER_CODES.length - 1 && (
-                      <Separator className="mt-4" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

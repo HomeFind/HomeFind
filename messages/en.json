@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "title": "RTD - Real Estate Search Platform",
+    "description": "Innovative platform for finding real estate in Uzbekistan"
+  },
+  "home": {
+    "title": "Find Your Dream Home",
+    "subtitle": "Discover properties with our advanced filtering system - easily find what you're looking for using our powerful filters",
+    "browseListings": "Browse Listings"
+  },
+  "listings": {
+    "title": "Property Listings",
+    "noListingsFound": "No listings found",
+    "noListingsDescription": "Try adjusting your filters to find what you're looking for.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "imageUnavailable": "Image unavailable",
+    "noImageAvailable": "No image available",
+    "priceOnRequest": "Price on request",
+    "totalArea": "Total area",
+    "buildingType": "Building type",
+    "housingType": "Housing type",
+    "adType": "Ad type",
+    "createdAt": "Created at"
+  },
+  "filters": {
+    "title": "Filters",
+    "propertyFilters": "Property Filters",
+    "activeFilters": "Active Filters",
+    "reset": "Reset",
+    "apply": "Apply",
+    "close": "Close",
+    "any": "Any",
+    "yes": "Yes",
+    "no": "No",
+    "minimum": "Minimum",
+    "maximum": "Maximum",
+    "min": "Min",
+    "max": "Max",
+    "selectOptions": "Select options...",
+    "selected": " selected",
+    "search": "Search",
+    "noOptionsFound": "No options found",
+    "remove": "Remove",
+    "attributes": {
+      "number_of_rooms": "Number of rooms",
+      "price": "Price",
+      "total_area": "Total area",
+      "district": "District",
+      "building_type": "Building type",
+      "housing_type": "Housing type",
+      "ad_type": "Ad type"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry"
+  }
+}
