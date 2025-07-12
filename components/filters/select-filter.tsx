@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { AttributeFilter, AttributeOptionType } from '@/lib/database.types';
+import { AttributeFilter } from '@/lib/database.types';
 import { useFilters } from './filter-context';
 
 interface SelectFilterProps {
@@ -175,8 +175,8 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
                     </div>
                     <span className="flex-1">{option.option_value}</span>
                     {/* Show count only if available */}
-                    {(option as any).count !== undefined && (
-                      <span className="ml-auto text-xs opacity-70">({(option as any).count})</span>
+                    {(option as { count?: number }).count !== undefined && (
+                      <span className="ml-auto text-xs opacity-70">({(option as { count?: number }).count})</span>
                     )}
                   </CommandItem>
                 );

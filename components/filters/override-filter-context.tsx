@@ -2,7 +2,7 @@
 // Filter functionality has been moved to StaticFiltersPanel with the main filter-context.tsx
 // This file can be safely removed in a future cleanup.
 
-import React, { useState, useContext, ReactNode, useCallback } from 'react';
+import React, { useState, ReactNode, useCallback } from 'react';
 import { FilterValue } from '@/lib/database.types';
 import { FilterContext } from './filter-context';
 

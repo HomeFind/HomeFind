@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AttributeFilter } from '@/lib/database.types';
 import { useFilters } from './filter-context';
-import { ArrowRightCircle, MinusCircle } from 'lucide-react';
+import { ArrowRightCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RangeFilterProps {

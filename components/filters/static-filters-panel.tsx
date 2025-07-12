@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { X, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,6 @@ import { useFilters } from './filter-context';
 import { cn } from '@/lib/utils';
 import { getAttributesWithOptions } from '@/lib/attributes';
 import { AttributeFilter } from '@/lib/database.types';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
 
 interface StaticFiltersPanelProps {
@@ -62,7 +61,7 @@ function RangeFilter({
       setRange([null, null]);
       setInputValues(['', '']);
     }
-  }, [existingFilter?.attributeCode, JSON.stringify(existingFilter?.value)]); // Use JSON.stringify to avoid reference issues
+  }, [existingFilter]);
 
   const handleInputChange = (index: 0 | 1, value: string) => {
     if (onInteraction) onInteraction();
@@ -225,7 +224,7 @@ function SelectFilter({
       // Only reset if there's no existing filter
       setSelectedOptions([]);
     }
-  }, [existingFilter?.attributeCode, JSON.stringify(existingFilter?.value)]); // Use JSON.stringify to avoid reference issues
+  }, [existingFilter]);
 
   const handleOptionToggle = (optionValue: string) => {
     if (onInteraction) onInteraction();
@@ -390,7 +389,6 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
   const t = useTranslations('filters');
   const [attributes, setAttributes] = useState<Map<string, AttributeFilter>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [activeAttribute, setActiveAttribute] = useState<string | undefined>(undefined);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Initial fetch only
@@ -463,8 +461,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
   }, [filters, initialLoadComplete]);
 
   // Handle attribute interaction - simplified to avoid re-fetching on every interaction
-  const handleAttributeInteraction = useCallback((attributeCode: string) => {
-    setActiveAttribute(attributeCode);
+  const handleAttributeInteraction = useCallback(() => {
     // Note: We've removed the immediate re-fetch to prevent input clearing
     // Options will be updated when filters are actually applied
   }, []);

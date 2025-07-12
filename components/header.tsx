@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
 import { LocaleSwitcher } from './locale-switcher';
 
 export function Header() {
-  const t = useTranslations('metadata');
 
   return (
     <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

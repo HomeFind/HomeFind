@@ -46,7 +46,7 @@ const formatFilterDisplay = (filter: FilterValue): { label: string; value: strin
   return { label: attributeName, value: valueDisplay };
 };
 
-export function AppliedFilters({ listingCount, loading = false }: AppliedFiltersProps) {
+export function AppliedFilters({ loading = false }: AppliedFiltersProps) {
   const { filters, removeFilter, applyFilters, clearFilters } = useFilters();
   const t = useTranslations('filters');
 

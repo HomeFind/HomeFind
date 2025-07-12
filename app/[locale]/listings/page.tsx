@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
-import { FilterProvider, FilterProviderWithSearchParams, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
+import { FilterProviderWithSearchParams, MobileFilterDialog, useFilters, AppliedFilters } from '@/components/filters';
 import { StaticFiltersPanel } from '@/components/filters/static-filters-panel';
 import { ListingItem } from '@/components/listing-item';
 import { getListingsWithImages } from '@/lib/listings';
@@ -16,9 +16,9 @@ function ListingsContent() {
   const t = useTranslations('listings');
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<Array<{
-    listing: any,
+    listing: { id: string; name: string; price: number; location: string; bedrooms: number; bathrooms: number; area: number; },
     images: string[],
-    attributes: Record<string, any>
+    attributes: Record<string, string | number | boolean>
   }>>([]);
   const [pagination, setPagination] = useState({
     total: 0,

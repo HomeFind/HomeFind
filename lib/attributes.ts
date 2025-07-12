@@ -42,10 +42,10 @@ interface AttributeResult {
   data_type: 'NUMBER' | 'VARCHAR' | 'DATE' | 'BOOLEAN' | 'ENUM';
   is_enumeration: boolean;
   is_multiple: boolean;
-  options: any[] | null;
+  options: AttributeOptionType[] | null;
   min_value: number | null;
   max_value: number | null;
-  available_values: any;
+  available_values: { min?: number; max?: number } | string[] | boolean[] | null;
 }
 
 /**

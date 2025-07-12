@@ -15,7 +15,7 @@ import { useTranslations } from 'next-intl';
 interface ListingItemProps {
   listing: ListingItemType;
   images: string[];
-  attributes?: Record<string, any>;
+  attributes?: Record<string, string | number | boolean>;
 }
 
 // Function to validate image URL
@@ -23,7 +23,7 @@ const isValidImageUrl = (url: string): boolean => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -44,7 +44,7 @@ const formatDate = (dateString: string): string => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
-  } catch (error) {
+  } catch {
     return dateString;
   }
 };
