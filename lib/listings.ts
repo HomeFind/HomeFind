@@ -1,8 +1,6 @@
 import { supabase } from './supabase';
-import { AttributeFilter, FilterValue, ListingItemType } from './database.types';
+import { FilterValue, ListingItemType } from './database.types';
 
-// Cache for attribute ID to avoid multiple lookups
-let imageAttributeIdCache: number | null = null;
 
 interface ListingResult {
   id: number;
@@ -13,7 +11,7 @@ interface ListingResult {
   created_at: string;
   updated_at: string;
   images: string[];
-  attributes: Record<string, any>;
+  attributes: Record<string, string | number | boolean>;
 }
 
 interface PaginatedListingsResult {
@@ -35,7 +33,7 @@ export async function getListingsWithImages(
   listings: Array<{ 
     listing: ListingItemType, 
     images: string[],
-    attributes: Record<string, any>
+    attributes: Record<string, string | number | boolean>
   }>,
   pagination: { total: number, currentPage: number, totalPages: number }
 }> {
@@ -72,6 +70,18 @@ export async function getListingsWithImages(
   // Parse the result
   const result = data as PaginatedListingsResult;
   
+  // Log the raw result for debugging
+  console.log('Raw database result:', result);
+  
+  // Handle case where data might be null or undefined
+  if (!result || !result.data) {
+    console.log('No data found or result is null, returning empty result');
+    return {
+      listings: [],
+      pagination: { total: 0, currentPage: page, totalPages: 0 }
+    };
+  }
+  
   // Transform into the expected format
   const listings = result.data.map(item => ({
     listing: {
@@ -90,9 +100,9 @@ export async function getListingsWithImages(
   return {
     listings,
     pagination: {
-      total: result.total,
-      currentPage: result.page,
-      totalPages: result.total_pages
+      total: result.total ?? 0,
+      currentPage: result.page ?? page,
+      totalPages: result.total_pages ?? 0
     }
   };
 }
@@ -111,51 +121,6 @@ export async function getListingImages(listingId: number): Promise<string[]> {
   return listing?.images || [];
 }
 
-/**
- * Get the attribute ID for images
- */
-async function getImagesAttributeId(): Promise<number | null> {
-  // Return from cache if available
-  if (imageAttributeIdCache !== null) {
-    return imageAttributeIdCache;
-  }
-
-  const { data, error } = await supabase
-    .from('attributes')
-    .select('id')
-    .eq('attribute_code', 'images')
-    .single();
-  
-  if (error || !data) {
-    console.error('Error finding images attribute:', error);
-    return null;
-  }
-  
-  // Cache the ID for future use
-  imageAttributeIdCache = data.id;
-  return data.id;
-}
-
-/**
- * Parse image values from string
- */
-function parseImageValues(valueString: string): string[] {
-  try {
-    // First try to parse as JSON
-    const parsed = JSON.parse(valueString);
-    if (Array.isArray(parsed)) {
-      return parsed;
-    } else if (typeof parsed === 'string') {
-      // Single image as string
-      return [parsed];
-    }
-  } catch (e) {
-    // If not JSON, treat as comma-separated or single URL
-    return valueString.split(',').map((url: string) => url.trim());
-  }
-  
-  return [];
-}
 
 /**
  * Fetch listings with optional filters

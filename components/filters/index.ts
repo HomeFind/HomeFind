@@ -1,8 +1,12 @@
-export { AttributeFilter } from './attribute-filter';
-export { FiltersPanel } from './filters-panel';
-export { SelectFilter } from './select-filter';
-export { RangeFilter } from './range-filter';
-export { ToggleFilter } from './toggle-filter';
+// TODO [DEPRECATED]: Commented out dynamic filter components
+// export { AttributeFilter } from './attribute-filter';
+// export { FiltersPanel } from './filters-panel';
+// export { SelectFilter } from './select-filter';
+// export { RangeFilter } from './range-filter';
+// export { ToggleFilter } from './toggle-filter';
+
+// NEW: Static filters panel
+export { StaticFiltersPanel } from './static-filters-panel';
 export { MobileFilterDialog } from './mobile-filter-dialog';
 
 // For pages that need URL persistence (like listings page), use these exports

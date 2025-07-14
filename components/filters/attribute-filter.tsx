@@ -1,3 +1,4 @@
+// TODO [DEPRECATED]: This component has been replaced by static filters in StaticFiltersPanel
 import React from 'react';
 import { AttributeFilter as AttributeFilterType } from '@/lib/database.types';
 import { SelectFilter } from './select-filter';
@@ -9,6 +10,7 @@ interface AttributeFilterProps {
   onInteraction?: () => void;
 }
 
+// TODO [DEPRECATED]: This component has been replaced by static filters in StaticFiltersPanel
 export function AttributeFilter({ attribute, onInteraction }: AttributeFilterProps) {
   // Only render filters for ENUM, NUMBER, and BOOLEAN types
   switch (attribute.type) {

@@ -1,3 +1,6 @@
+// TODO [DEPRECATED]: This component has been replaced by inline SelectFilter in StaticFiltersPanel
+// This file can be safely removed in a future cleanup.
+
 import React, { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown, Tag, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -5,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { AttributeFilter, AttributeOptionType } from '@/lib/database.types';
+import { AttributeFilter } from '@/lib/database.types';
 import { useFilters } from './filter-context';
 
 interface SelectFilterProps {
@@ -172,8 +175,8 @@ export function SelectFilter({ attribute, onInteraction }: SelectFilterProps) {
                     </div>
                     <span className="flex-1">{option.option_value}</span>
                     {/* Show count only if available */}
-                    {(option as any).count !== undefined && (
-                      <span className="ml-auto text-xs opacity-70">({(option as any).count})</span>
+                    {(option as { count?: number }).count !== undefined && (
+                      <span className="ml-auto text-xs opacity-70">({(option as { count?: number }).count})</span>
                     )}
                   </CommandItem>
                 );

@@ -1,3 +1,4 @@
+// TODO [DEPRECATED]: Boolean filters not needed for static filters
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, XCircle, Circle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
@@ -11,6 +12,7 @@ interface ToggleFilterProps {
   onInteraction?: () => void;
 }
 
+// TODO [DEPRECATED]: Boolean filters not needed for static filters
 export function ToggleFilter({ attribute, onInteraction }: ToggleFilterProps) {
   const { pendingFilters, setFilter, removeFilter } = useFilters();
   const [checked, setChecked] = useState<boolean | null>(null);
@@ -51,11 +53,6 @@ export function ToggleFilter({ attribute, onInteraction }: ToggleFilterProps) {
     removeFilter(attribute.code);
   };
 
-  // Check if the option is available based on filter context
-  const isOptionAvailable = (value: boolean) => {
-    if (!attribute.availableValues) return true;
-    return attribute.availableValues.includes(value);
-  };
 
   return (
     <div className="space-y-2">

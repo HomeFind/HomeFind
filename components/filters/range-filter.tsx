@@ -1,3 +1,6 @@
+// TODO [DEPRECATED]: This component has been replaced by inline RangeFilter in StaticFiltersPanel
+// This file can be safely removed in a future cleanup.
+
 import React, { useEffect, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
@@ -5,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AttributeFilter } from '@/lib/database.types';
 import { useFilters } from './filter-context';
-import { ArrowRightCircle, MinusCircle } from 'lucide-react';
+import { ArrowRightCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RangeFilterProps {

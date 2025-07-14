@@ -1,10 +1,10 @@
+// TODO [DEPRECATED]: This component has been replaced by StaticFiltersPanel
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { X, Sliders, SearchIcon, Check, Settings2 } from 'lucide-react';
+import { X, SearchIcon, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { AttributeFilter } from './attribute-filter';
 import { AttributeFilter as AttributeFilterType } from '@/lib/database.types';
@@ -18,6 +18,7 @@ interface FiltersPanelProps {
   isOpen?: boolean;
 }
 
+// TODO [DEPRECATED]: This component has been replaced by StaticFiltersPanel
 export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanelProps) {
   const { clearFilters, applyFilters, filters, pendingFilters } = useFilters();
   const [attributes, setAttributes] = useState<AttributeFilterType[]>([]);
@@ -163,7 +164,6 @@ export function FiltersPanel({ className, onClose, isOpen = true }: FiltersPanel
     return null;
   }
 
-  const hasActiveFilters = filters.length > 0;
   const hasPendingFilters = pendingFilters.length > 0;
   const hasFilterChanges = JSON.stringify(filters) !== JSON.stringify(pendingFilters);
   const activeFilterCount = pendingFilters.length;

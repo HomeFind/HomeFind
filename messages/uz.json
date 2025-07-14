@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "title": "RTD - Uy-joy izlash platformasi",
+    "description": "O'zbekistonda uy-joy topish uchun innovatsion platforma"
+  },
+  "home": {
+    "title": "O'z orzuingizdagi uyni toping",
+    "subtitle": "Kuchli filtrlar yordamida uy-joylarni tez va oson toping",
+    "browseListings": "E'lonlarni ko'rish"
+  },
+  "listings": {
+    "title": "Barcha e'lonlar",
+    "noListingsFound": "Hech qanday e'lon topilmadi",
+    "noListingsDescription": "Qidirayotganingizni topish uchun filtrlarni o'zgartiring.",
+    "previous": "Oldingi",
+    "next": "Keyingi",
+    "page": "Sahifa",
+    "of": "dan",
+    "imageUnavailable": "Rasm mavjud emas",
+    "noImageAvailable": "Rasm mavjud emas",
+    "priceOnRequest": "Narxi kelishilgan holda",
+    "totalArea": "Umumiy maydon",
+    "buildingType": "Bino turi",
+    "housingType": "Uy-joy turi",
+    "adType": "E'lon turi",
+    "createdAt": "Yaratilgan sana"
+  },
+  "filters": {
+    "title": "Filtrlar",
+    "propertyFilters": "E'lon filtrlari",
+    "activeFilters": "Faol filtrlar",
+    "reset": "Tozalash",
+    "apply": "Qo'llash",
+    "close": "Yopish",
+    "any": "Har qanday",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "minimum": "Minimal",
+    "maximum": "Maksimal",
+    "min": "Min",
+    "max": "Maks",
+    "selectOptions": "Variantlarni tanlang...",
+    "selected": "ta tanlangan",
+    "search": "Qidirish",
+    "noOptionsFound": "Hech qanday variant topilmadi",
+    "remove": "O'chirish",
+    "attributes": {
+      "number_of_rooms": "Xonalar soni",
+      "price": "Narx",
+      "total_area": "Umumiy maydon",
+      "district": "Tuman",
+      "building_type": "Bino turi",
+      "housing_type": "Uy-joy turi",
+      "ad_type": "E'lon turi"
+    }
+  },
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "retry": "Qayta urinish"
+  }
+}
