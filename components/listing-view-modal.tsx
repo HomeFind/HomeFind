@@ -16,6 +16,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from '@/components/ui/carousel';
 import { ExternalLink, Phone, Calendar, MapPin, DollarSign, Ruler, Building, Home, Tag, User, FileText } from 'lucide-react';
 import { getListingDetails, ListingDetails } from '@/lib/listings';
@@ -53,6 +54,8 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
   const [listing, setListing] = useState<ListingDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
   const t = useTranslations('listings');
 
   const fetchListingDetails = useCallback(async () => {
@@ -74,6 +77,18 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
       fetchListingDetails();
     }
   }, [open, listingId, fetchListingDetails]);
+
+  useEffect(() => {
+    if (!carouselApi) {
+      return;
+    }
+
+    setCurrent(carouselApi.selectedScrollSnap());
+
+    carouselApi.on('select', () => {
+      setCurrent(carouselApi.selectedScrollSnap());
+    });
+  }, [carouselApi]);
 
   const handleImageError = (index: number) => {
     setImageErrors(prev => ({ ...prev, [index]: true }));
@@ -132,34 +147,53 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
         <div className="space-y-6">
           {/* Images Carousel */}
           {listing.images.length > 0 && (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {listing.images.map((imageUrl, index) => (
-                  <CarouselItem key={index}>
-                    <AspectRatio ratio={16 / 9}>
-                      {!imageErrors[index] ? (
-                        <img
-                          src={imageUrl}
-                          alt={`Image ${index + 1} of ${listing.title}`}
-                          className="object-cover rounded-lg w-full h-full"
-                          onError={() => handleImageError(index)}
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
-                          <span className="text-muted-foreground">{t('imageUnavailable')}</span>
-                        </div>
-                      )}
-                    </AspectRatio>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
+            <div className="space-y-4">
+              <Carousel className="w-full" setApi={setCarouselApi}>
+                <CarouselContent>
+                  {listing.images.map((imageUrl, index) => (
+                    <CarouselItem key={index}>
+                      <AspectRatio ratio={16 / 9}>
+                        {!imageErrors[index] ? (
+                          <img
+                            src={imageUrl}
+                            alt={`Image ${index + 1} of ${listing.title}`}
+                            className="object-cover rounded-lg w-full h-full"
+                            onError={() => handleImageError(index)}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-muted flex items-center justify-center rounded-lg">
+                            <span className="text-muted-foreground">{t('imageUnavailable')}</span>
+                          </div>
+                        )}
+                      </AspectRatio>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {listing.images.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </>
+                )}
+              </Carousel>
+
+              {/* Carousel Dots */}
               {listing.images.length > 1 && (
-                <>
-                  <CarouselPrevious className="left-2" />
-                  <CarouselNext className="right-2" />
-                </>
+                <div className="flex justify-center gap-2">
+                  {listing.images.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`h-2 w-2 rounded-full transition-all ${current === index
+                          ? 'bg-primary w-6'
+                          : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                        }`}
+                      onClick={() => carouselApi?.scrollTo(index)}
+                      aria-label={`Go to image ${index + 1}`}
+                    />
+                  ))}
+                </div>
               )}
-            </Carousel>
+            </div>
           )}
 
           {/* Title and Room Info */}
