@@ -27,7 +27,7 @@ export function FilterProviderWithSearchParams({ children }: { children: ReactNo
     for (const [key, value] of searchParams.entries()) {
       if (key.startsWith('filter_')) {
         const attributeCode = key.replace('filter_', '');
-        let parsedValue: string | number | boolean | (string | number)[] = value;
+        let parsedValue: string | number | boolean | string[] | number[] | [number, number] | [string, string] | null = value;
         
         // Try to parse array values
         if (value.startsWith('[') && value.endsWith(']')) {

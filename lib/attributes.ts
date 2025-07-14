@@ -92,20 +92,20 @@ export async function getAttributesWithOptions(
       attribute.maxValue = attr.max_value;
 
       // Add available min/max from filtered data
-      if (attr.available_values) {
+      if (attr.available_values && typeof attr.available_values === 'object' && 'min' in attr.available_values) {
         attribute.availableMinValue = attr.available_values.min;
         attribute.availableMaxValue = attr.available_values.max;
       }
     }
 
     // Add available options for ENUM types
-    if (attr.data_type === 'ENUM' && attr.available_values) {
-      attribute.availableOptions = attr.available_values;
+    if (attr.data_type === 'ENUM' && attr.available_values && Array.isArray(attr.available_values)) {
+      attribute.availableOptions = attr.available_values as string[];
     }
 
     // Add available values for BOOLEAN types
-    if (attr.data_type === 'BOOLEAN' && attr.available_values) {
-      attribute.availableValues = attr.available_values;
+    if (attr.data_type === 'BOOLEAN' && attr.available_values && Array.isArray(attr.available_values)) {
+      attribute.availableValues = attr.available_values as boolean[];
     }
 
     return attribute;

@@ -22,16 +22,33 @@ interface PaginatedListingsResult {
   data: ListingResult[];
 }
 
+export interface ListingDetails {
+  id: number;
+  slug: string;
+  price: number | null;
+  title: string;
+  images: string[];
+  attributes: Record<string, string | number | boolean>;
+  details: {
+    author_name: string | null;
+    author_phone: string | null;
+    notes: string | null;
+  };
+  created_at: string;
+  updated_at: string;
+  description: string | null;
+}
+
 /**
  * Fetch listings with their attributes and apply filters using the database procedure
  */
 export async function getListingsWithImages(
-  filters: FilterValue[] = [], 
+  filters: FilterValue[] = [],
   page: number = 1,
   pageSize: number = 20
 ): Promise<{
-  listings: Array<{ 
-    listing: ListingItemType, 
+  listings: Array<{
+    listing: ListingItemType,
     images: string[],
     attributes: Record<string, string | number | boolean>
   }>,
@@ -69,10 +86,10 @@ export async function getListingsWithImages(
 
   // Parse the result
   const result = data as PaginatedListingsResult;
-  
+
   // Log the raw result for debugging
   console.log('Raw database result:', result);
-  
+
   // Handle case where data might be null or undefined
   if (!result || !result.data) {
     console.log('No data found or result is null, returning empty result');
@@ -81,7 +98,7 @@ export async function getListingsWithImages(
       pagination: { total: 0, currentPage: page, totalPages: 0 }
     };
   }
-  
+
   // Transform into the expected format
   const listings = result.data.map(item => ({
     listing: {
@@ -112,15 +129,31 @@ export async function getListingsWithImages(
  */
 export async function getListingImages(listingId: number): Promise<string[]> {
   // This is now handled by the database procedure, but keeping for compatibility
-  const { listings } = await getListingsWithImages([{ 
-    attributeCode: 'id', 
-    value: listingId 
+  const { listings } = await getListingsWithImages([{
+    attributeCode: 'id',
+    value: listingId
   }]);
-  
+
   const listing = listings.find(item => item.listing.id === listingId);
   return listing?.images || [];
 }
 
+
+/**
+ * Fetch a single listing with all details using the show_listing database function
+ */
+export async function getListingDetails(listingId: number): Promise<ListingDetails | null> {
+  const { data, error } = await supabase.rpc('show_listing', {
+    listing_item_id: listingId
+  });
+
+  if (error) {
+    console.error('Error fetching listing details:', error);
+    return null;
+  }
+
+  return data;
+}
 
 /**
  * Fetch listings with optional filters
@@ -131,7 +164,7 @@ export async function getListings(filters: FilterValue[] = []) {
     .from('listing_items')
     .select('*')
     .order('created_at', { ascending: false });
-  
+
   // Apply filters if any
   if (filters.length > 0) {
     // This is a simplified example - in a real app, you'd need more complex query building
@@ -144,17 +177,17 @@ export async function getListings(filters: FilterValue[] = []) {
         if (min > 0) query = query.gte('price', min);
         if (max < Infinity) query = query.lte('price', max);
       }
-      
+
       // Add more filter handling here based on your needs
     }
   }
-  
+
   const { data: listings, error } = await query;
-  
+
   if (error) {
     console.error('Error fetching listings:', error);
     return [];
   }
-  
+
   return listings || [];
-} 
+}

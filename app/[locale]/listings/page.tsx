@@ -16,7 +16,7 @@ function ListingsContent() {
   const t = useTranslations('listings');
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<Array<{
-    listing: { id: string; name: string; price: number; location: string; bedrooms: number; bathrooms: number; area: number; },
+    listing: { id: number; slug: string; price: number | null; title: string; description: string | null; created_at: string; updated_at: string; },
     images: string[],
     attributes: Record<string, string | number | boolean>
   }>>([]);
