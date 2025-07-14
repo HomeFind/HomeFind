@@ -547,12 +547,12 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
                   {attribute.type === 'NUMBER' ? (
                     <RangeFilter
                       attribute={attribute}
-                      onInteraction={() => handleAttributeInteraction(code)}
+                      onInteraction={() => handleAttributeInteraction()}
                     />
                   ) : (
                     <SelectFilter
                       attribute={attribute}
-                      onInteraction={() => handleAttributeInteraction(code)}
+                      onInteraction={() => handleAttributeInteraction()}
                     />
                   )}
 
