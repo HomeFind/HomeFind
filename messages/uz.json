@@ -36,8 +36,8 @@
     "layout": "Joylashuv",
     "yearBuilt": "Qurilgan yil",
     "contactInfo": "Mijoz haqida ma’lumot",
-    "contactPerson": "Mijoz ismi",
-    "contactPhone": "Mijoz telefoni",
+    "authorName": "Mijoz ismi",
+    "authorPhone": "Mijoz telefoni",
     "notes": "Izohlar",
     "viewOnOlx": "OLX da ko'rish",
     "call": "Qo'ng'iroq qilish"

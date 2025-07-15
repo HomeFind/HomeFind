@@ -36,8 +36,8 @@
     "layout": "Layout",
     "yearBuilt": "Year Built",
     "contactInfo": "Contact Information",
-    "contactPerson": "Client Name",
-    "contactPhone": "Client Phone",
+    "authorName": "Author Name",
+    "authorPhone": "Author Phone",
     "notes": "Notes",
     "viewOnOlx": "View on OLX",
     "call": "Call"

@@ -329,7 +329,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
                     className="text-sm text-muted-foreground flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
-                    {t('contactPerson')}:
+                    {t('authorName')}:
                   </label>
                   <Input
                     id="contact-person"
@@ -345,7 +345,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
                     className="text-sm text-muted-foreground flex items-center gap-2"
                   >
                     <Phone className="w-4 h-4" />
-                    {t('contactPhone')}:
+                    {t('authorPhone')}:
                   </label>
                   <Input
                     id="contact-phone"

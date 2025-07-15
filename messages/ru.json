@@ -36,8 +36,8 @@
     "layout": "Планировка",
     "yearBuilt": "Год постройки",
     "contactInfo": "Контактная информация",
-    "contactPerson": "Имя клиента",
-    "contactPhone": "Телефон клиента",
+    "authorName": "Имя клиента",
+    "authorPhone": "Телефон клиента",
     "notes": "Заметки",
     "viewOnOlx": "Посмотреть на OLX",
     "call": "Позвонить"
