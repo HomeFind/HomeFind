@@ -99,7 +99,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
   if (loading) {
     return (
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               <VisuallyHidden>{t('loading')}</VisuallyHidden>
@@ -119,7 +119,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
   if (!listing) {
     return (
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               <VisuallyHidden>{t('listingNotFound')}</VisuallyHidden>
@@ -137,7 +137,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             <VisuallyHidden>{listing.title}</VisuallyHidden>
@@ -199,7 +199,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
           {/* Title and Room Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold">{listing.title}</h2>
+              <h2 className="text-lg sm:text-2xl font-bold">{listing.title}</h2>
             </div>
 
             {/* Number of rooms, floor, building floors */}
@@ -225,7 +225,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Column 1 */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t('propertyDetails')}</h3>
+              <h3 className="text-base sm:text-lg font-semibold">{t('propertyDetails')}</h3>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -320,7 +320,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
 
             {/* Column 2 - Moderator Info */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t('contactInfo')}</h3>
+              <h3 className="text-base sm:text-lg font-semibold">{t('contactInfo')}</h3>
 
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -375,11 +375,11 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Button
               variant="outline"
               onClick={() => window.open(generateOlxUrl(listing.slug), '_blank')}
-              className="flex-1 cursor-pointer"
+              className="w-full sm:flex-1 cursor-pointer"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               {t('viewOnOlx')}
@@ -388,7 +388,7 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
             {listing.attributes.author_phone && (
               <Button
                 onClick={() => window.open(`tel:${listing.attributes.author_phone}`, '_self')}
-                className="flex-1 cursor-pointer"
+                className="w-full sm:flex-1 cursor-pointer"
               >
                 <Phone className="w-4 h-4 mr-2" />
                 {t('call')} {listing.attributes.author_phone}

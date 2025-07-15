@@ -484,7 +484,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
   const activeFilterCount = pendingFilters.length;
 
   return (
-    <Card className={cn("overflow-hidden border-muted/60 shadow-sm", className)}>
+    <Card className={cn("overflow-hidden border-muted/60 shadow-sm flex flex-col", className)}>
       <CardHeader className="px-3 py-2 bg-background border-b border-border/40">
         <div className="flex items-center justify-between mb-3">
           <CardTitle className="text-base flex items-center gap-1.5">
@@ -492,8 +492,8 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
             {t('propertyFilters')}
           </CardTitle>
           {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-7 w-7 rounded-full">
-              <X className="h-4 w-4" />
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 rounded-full sm:h-7 sm:w-7">
+              <X className="h-6 w-6 sm:h-4 sm:w-4" />
               <span className="sr-only">{t('close')}</span>
             </Button>
           )}
@@ -526,7 +526,7 @@ export function StaticFiltersPanel({ className, onClose, isOpen = true }: Static
         </div>
       </CardHeader>
 
-      <CardContent className="p-3">
+      <CardContent className="p-3 pb-6 overflow-y-auto flex-1 sm:pb-3">
         {loading ? (
           <div className="space-y-4 animate-pulse">
             {Array.from({ length: 7 }).map((_, i) => (
