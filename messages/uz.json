@@ -40,7 +40,9 @@
     "authorPhone": "Mijoz telefoni",
     "notes": "Izohlar",
     "viewOnOlx": "OLX da ko'rish",
-    "call": "Qo'ng'iroq qilish"
+    "call": "Qo'ng'iroq qilish",
+    "saveChanges": "Saqlash",
+    "saving": "Saqlanmoqda..."
   },
   "filters": {
     "title": "Filtrlar",

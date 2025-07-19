@@ -40,7 +40,9 @@
     "authorPhone": "Телефон клиента",
     "notes": "Заметки",
     "viewOnOlx": "Посмотреть на OLX",
-    "call": "Позвонить"
+    "call": "Позвонить",
+    "saveChanges": "Сохранить",
+    "saving": "Сохранение..."
   },
   "filters": {
     "title": "Фильтры",

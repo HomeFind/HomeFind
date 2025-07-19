@@ -40,7 +40,9 @@
     "authorPhone": "Author Phone",
     "notes": "Notes",
     "viewOnOlx": "View on OLX",
-    "call": "Call"
+    "call": "Call",
+    "saveChanges": "Save changes",
+    "saving": "Saving..."
   },
   "filters": {
     "title": "Filters",

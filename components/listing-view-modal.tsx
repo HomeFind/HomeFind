@@ -19,7 +19,7 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import { ExternalLink, Phone, Calendar, MapPin, DollarSign, Ruler, Building, Home, Tag, User, FileText } from 'lucide-react';
-import { getListingDetails, ListingDetails } from '@/lib/listings';
+import { getListingDetails, ListingDetails, saveListingContactInfo, ContactInfoData } from '@/lib/listings';
 import { useTranslations } from 'next-intl';
 
 interface ListingViewModalProps {
@@ -56,6 +56,17 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [contactForm, setContactForm] = useState({
+    author_name: '',
+    author_phone: '',
+    notes: ''
+  });
+  const [originalContactForm, setOriginalContactForm] = useState({
+    author_name: '',
+    author_phone: '',
+    notes: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
   const t = useTranslations('listings');
 
   const fetchListingDetails = useCallback(async () => {
@@ -64,7 +75,16 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
     setLoading(true);
     try {
       const data = await getListingDetails(listingId);
-      setListing(data);
+      if (data) {
+        setListing(data);
+        const initialFormData = {
+          author_name: data.details.author_name || '',
+          author_phone: data.details.author_phone || '',
+          notes: data.details.notes || ''
+        };
+        setContactForm(initialFormData);
+        setOriginalContactForm(initialFormData);
+      }
     } catch (error) {
       console.error('Error fetching listing details:', error);
     } finally {
@@ -93,6 +113,56 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
   const handleImageError = (index: number) => {
     setImageErrors(prev => ({ ...prev, [index]: true }));
   };
+
+  const handleContactFormChange = useCallback((field: keyof typeof contactForm, value: string) => {
+    setContactForm(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  // Calculate if form has changes (similar to static-filters-panel.tsx)
+  const hasFormChanges = JSON.stringify(contactForm) !== JSON.stringify(originalContactForm);
+
+  const saveContactInfo = useCallback(async () => {
+    if (!listingId || !hasFormChanges) return;
+
+    setIsSaving(true);
+    try {
+      const contactData: ContactInfoData = {
+        author_name: contactForm.author_name.trim() || undefined,
+        author_phone: contactForm.author_phone.trim() || undefined,
+        notes: contactForm.notes.trim() || undefined,
+      };
+
+      const result = await saveListingContactInfo(listingId, contactData);
+
+      if (!result) {
+        throw new Error('Failed to save contact info');
+      }
+
+      // Update original form data to reflect saved state
+      setOriginalContactForm({ ...contactForm });
+
+      // Update local listing state with the saved data
+      if (listing) {
+        setListing({
+          ...listing,
+          details: {
+            ...listing.details,
+            author_name: contactForm.author_name,
+            author_phone: contactForm.author_phone,
+            notes: contactForm.notes,
+          },
+        });
+      }
+
+      // Show success feedback
+      console.log('Contact info saved successfully');
+    } catch (error) {
+      console.error('Error saving contact info:', error);
+      alert(`Failed to save contact information: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [listingId, hasFormChanges, contactForm, listing]);
 
   if (!open) return null;
 
@@ -184,8 +254,8 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
                     <button
                       key={index}
                       className={`h-2 w-2 rounded-full transition-all ${current === index
-                          ? 'bg-primary w-6'
-                          : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                        ? 'bg-primary w-6'
+                        : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
                         }`}
                       onClick={() => carouselApi?.scrollTo(index)}
                       aria-label={`Go to image ${index + 1}`}
@@ -318,9 +388,21 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
               </div>
             </div>
 
-            {/* Column 2 - Moderator Info */}
+            {/* Column 2 - Contact Info */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-semibold">{t('contactInfo')}</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-base sm:text-lg font-semibold">{t('contactInfo')}</h3>
+                {hasFormChanges && (
+                  <Button
+                    onClick={saveContactInfo}
+                    disabled={isSaving}
+                    size="sm"
+                    className="ml-4"
+                  >
+                    {isSaving ? t('saving') : t('saveChanges')}
+                  </Button>
+                )}
+              </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -333,9 +415,8 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
                   </label>
                   <Input
                     id="contact-person"
-                    value={listing.details.author_name || ''}
-                    readOnly
-                    className="bg-muted"
+                    value={contactForm.author_name}
+                    onChange={(e) => handleContactFormChange('author_name', e.target.value)}
                   />
                 </div>
 
@@ -349,9 +430,8 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
                   </label>
                   <Input
                     id="contact-phone"
-                    value={listing.details.author_phone || ''}
-                    readOnly
-                    className="bg-muted"
+                    value={contactForm.author_phone}
+                    onChange={(e) => handleContactFormChange('author_phone', e.target.value)}
                   />
                 </div>
 
@@ -365,9 +445,9 @@ export function ListingViewModal({ listingId, open, onClose }: ListingViewModalP
                   </label>
                   <Textarea
                     id="contact-notes"
-                    value={listing.details.notes || ''}
-                    readOnly
-                    className="bg-muted min-h-[120px]"
+                    value={contactForm.notes}
+                    onChange={(e) => handleContactFormChange('notes', e.target.value)}
+                    className="min-h-[120px]"
                   />
                 </div>
               </div>

@@ -39,6 +39,22 @@ export interface ListingDetails {
   description: string | null;
 }
 
+export interface ContactInfoData {
+  author_name?: string;
+  author_phone?: string;
+  notes?: string;
+}
+
+export interface ContactInfoResponse {
+  id: number;
+  listing_item_id: number;
+  author_name: string | null;
+  author_phone: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 /**
  * Fetch listings with their attributes and apply filters using the database procedure
  */
@@ -190,4 +206,43 @@ export async function getListings(filters: FilterValue[] = []) {
   }
 
   return listings || [];
+}
+
+/**
+ * Save contact information for a listing
+ */
+export async function saveListingContactInfo(
+  listingItemId: number,
+  contactData: ContactInfoData
+): Promise<ContactInfoResponse | null> {
+  const { data, error } = await supabase
+    .from('listing_details')
+    .upsert(
+      {
+        listing_item_id: listingItemId,
+        author_name: contactData.author_name || null,
+        author_phone: contactData.author_phone || null,
+        notes: contactData.notes || null,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: 'listing_item_id',
+        ignoreDuplicates: false,
+      }
+    )
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error upserting contact info:', error);
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint
+    });
+    return null;
+  }
+
+  return data;
 }
